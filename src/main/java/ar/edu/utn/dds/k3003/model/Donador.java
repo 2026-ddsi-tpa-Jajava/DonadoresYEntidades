@@ -1,10 +1,18 @@
 package ar.edu.utn.dds.k3003.model;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.CategoriaDonadorEnum;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
-public class Donador {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-  private String id;
+@Setter
+@Getter
+public class Donador extends Persistable {
   private String nombre;
   private String apellido;
   private Integer edad;
@@ -14,13 +22,25 @@ public class Donador {
   private EstadoDonadorEnum estado;
   private String categoria;
 
+  @Setter(AccessLevel.NONE)
+  private List<EstadoDonadorEnum> historialEstados = new ArrayList<>();
+
+  @Setter(AccessLevel.NONE)
+  private List<Queja> quejas = new ArrayList<>();
+
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private final Random random = new Random();
+
   public Donador(
+      String id,
       String nombre,
       String apellido,
       Integer edad,
       String email,
       String nroDocumento,
       String domicilio) {
+    super(id);
     this.nombre = nombre;
     this.apellido = apellido;
     this.edad = edad;
@@ -28,78 +48,67 @@ public class Donador {
     this.nroDocumento = nroDocumento;
     this.domicilio = domicilio;
     this.estado = EstadoDonadorEnum.VERIFICADO;
-    this.categoria = "Ocasional";
+    this.categoria = CategoriaDonadorEnum.OCASIONAL.name();
   }
 
-  public String getId() {
-    return id;
-  }
+  public Donador(
+      String id,
+      String nombre,
+      String apellido,
+      Integer edad,
+      String email,
+      String nroDocumento,
+      String domicilio,
+      EstadoDonadorEnum estado,
+      String categoria) {
+    super(id);
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getNombre() {
-    return nombre;
-  }
-
-  public void setNombre(String nombre) {
     this.nombre = nombre;
-  }
-
-  public String getApellido() {
-    return apellido;
-  }
-
-  public void setApellido(String apellido) {
     this.apellido = apellido;
-  }
-
-  public Integer getEdad() {
-    return edad;
-  }
-
-  public void setEdad(Integer edad) {
     this.edad = edad;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
     this.email = email;
-  }
-
-  public String getNroDocumento() {
-    return nroDocumento;
-  }
-
-  public void setNroDocumento(String nroDocumento) {
     this.nroDocumento = nroDocumento;
-  }
-
-  public String getDomicilio() {
-    return domicilio;
-  }
-
-  public void setDomicilio(String domicilio) {
     this.domicilio = domicilio;
+    this.estado = estado;
+    this.categoria = categoria;
+
+    this.agregarEstadoAHistorial();
   }
 
-  public EstadoDonadorEnum getEstado() {
-    return estado;
+  public boolean puedeDonar() {
+    return switch (this.estado) {
+      case VERIFICADO -> true;
+      case SOSPECHOSO -> random.nextBoolean(); // 50% de probabilidad de poder donar
+      case BANEADO -> false;
+    };
   }
 
   public void setEstado(EstadoDonadorEnum estado) {
     this.estado = estado;
+    this.agregarEstadoAHistorial();
   }
 
-  public String getCategoria() {
-    return categoria;
+  public void agregarQueja(Queja queja) {
+    this.quejas.add(queja);
+    this.validarCantidadQuejas();
   }
 
-  public void setCategoria(String categoria) {
-    this.categoria = categoria;
+  private void validarCantidadQuejas() {
+    int cantidadQuejas = this.quejas.size();
+
+    if (cantidadQuejas >= 10) {
+      this.estado = EstadoDonadorEnum.BANEADO;
+      this.agregarEstadoAHistorial();
+      return;
+    }
+
+    if (cantidadQuejas >= 5) {
+      this.estado = EstadoDonadorEnum.SOSPECHOSO;
+      this.agregarEstadoAHistorial();
+    }
+  }
+
+  private void agregarEstadoAHistorial() {
+    this.historialEstados.add(this.estado);
   }
 }

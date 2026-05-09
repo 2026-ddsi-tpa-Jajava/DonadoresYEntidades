@@ -1,150 +1,210 @@
 package ar.edu.utn.dds.k3003;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.CategoriaDonadorEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaDonadoresYEntidades;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaIncentivos;
 import ar.edu.utn.dds.k3003.exceptions.DonadorNoEncontradoException;
-import ar.edu.utn.dds.k3003.exceptions.DonadorYaExistenteException;
-import ar.edu.utn.dds.k3003.repositories.DonadoresRepository;
-import ar.edu.utn.dds.k3003.repositories.DonadoresYEntidadesDataMapper;
-import ar.edu.utn.dds.k3003.repositories.InMemoryDonadoresRepo;
+
 import java.util.List;
 import java.util.NoSuchElementException;
-import lombok.val;
+
+import ar.edu.utn.dds.k3003.exceptions.EntidadNoEncontradaException;
+import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
+import ar.edu.utn.dds.k3003.mappers.*;
+import ar.edu.utn.dds.k3003.model.*;
+import ar.edu.utn.dds.k3003.repositories.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
 
-  private DonadoresRepository donadoresRepository;
-  private DonadoresYEntidadesDataMapper donadoresYEntidadesDataMapper =
-      new DonadoresYEntidadesDataMapper();
+  private FachadaIncentivos fachadaIncentivos;
+
+  private final DonadoresRepository donadoresRepository;
+  private final EntidadesRepository entidadesRepository;
+  private final QuejasRepository quejasRepository;
+  private final NecesidadesRepository necesidadesRepository;
+
+  private final NuevoDonadorMapper nuevoDonadorMapper = new NuevoDonadorMapper();
+
+  private final DonadorAssembler donadorAssembler = new DonadorAssembler();
+  private final QuejaAssembler quejaAssembler = new QuejaAssembler();
+  private final EntidadBeneficaAssembler entidadAssembler = new EntidadBeneficaAssembler();
+  private final NecesidadMaterialAssembler necesidadAssembler = new NecesidadMaterialAssembler();
+
+  private final DonadorStatsTransformer donadorStatsTransformer = new DonadorStatsTransformer();
+
+  private final InsigniaMapper insigniaMapper = new InsigniaMapper();
+  private final MisionMapper misionMapper = new MisionMapper();
+
+  private final DonadorStatsDTOMapper donadorStatsDTOMapper = new DonadorStatsDTOMapper();
 
   public Fachada() {
-    /*
-    Para que se ejecuten correctamente los tests, se necesita tener un constructor vacio
-    Es decir, que no reciba parametros.
-    Si necesitan un constructor con parametros
-    Java permite tener varios constructores conviviendo sin conflictos.
-    */
-
     this.donadoresRepository = new InMemoryDonadoresRepo();
+    this.entidadesRepository = new InMemoryEntidadesRepo();
+    this.quejasRepository = new InMemoryQuejasRepo();
+    this.necesidadesRepository = new InMemoryNecesidadesRepo();
   }
 
   @Override
   public DonadorDTO agregarDonador(DonadorDTO donadorDTO) {
-    if (this.donadoresRepository.findById(donadorDTO.id()).isPresent()) {
-      throw new DonadorYaExistenteException("Ya existe un donador con ese ID");
-    }
+    if (donadorDTO == null) throw new IllegalArgumentException("El donador no puede ser nulo");
+    Donador donador = this.donadoresRepository.save(this.nuevoDonadorMapper.map(donadorDTO));
+    return this.donadorAssembler.toDTO(donador);
+  }
 
-    val donador = donadoresYEntidadesDataMapper.toDonador(donadorDTO);
-
-    val donadorGuardado = this.donadoresRepository.save(donador);
-
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorGuardado);
+  public List<DonadorDTO> obtenerDonadores() {
+    return this.donadoresRepository.findAll().stream()
+            .map(this.donadorAssembler::toDTO)
+            .toList();
   }
 
   @Override
-  public DonadorDTO buscarDonadorPorID(String donadorID) throws NoSuchElementException {
-    val donadorOptional = this.donadoresRepository.findById(donadorID);
-
-    if (donadorOptional.isEmpty()) {
-      throw new DonadorNoEncontradoException("No existe un donador con ese ID");
-    }
-    val donadorFinal = donadorOptional.get();
-
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorFinal);
+  public DonadorDTO buscarDonadorPorID(String donadorID) {
+    return this.donadorAssembler.toDTO(this.obtenerDonador(donadorID));
   }
 
   @Override
-  public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado)
-      throws NoSuchElementException {
+  public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
+    if (estado == null) throw new IllegalArgumentException("El estado no puede ser nulo");
 
-    val donadorOptional = this.donadoresRepository.findById(donadorID);
+    Donador donador = this.obtenerDonador(donadorID);
+    donador.setEstado(estado);
 
-    if (donadorOptional.isEmpty()) {
-      throw new DonadorNoEncontradoException("No existe un donador con ese ID");
-    }
-
-    val donadorFinal = donadorOptional.get();
-    donadorFinal.setEstado(estado);
-
-    this.donadoresRepository.deleteById(donadorID);
-    this.donadoresRepository.save(donadorFinal);
-
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorFinal);
+    return this.donadorAssembler.toDTO(this.donadoresRepository.update(donador));
   }
 
   @Override
-  public DonadorDTO modifcarCategoria(String donadorID, String categoria)
-      throws NoSuchElementException {
-    val donadorOptional = this.donadoresRepository.findById(donadorID);
-    if (donadorOptional.isEmpty()) {
-      throw new DonadorNoEncontradoException("No existe un donador con ese ID");
-    }
-    val donadorFinal = donadorOptional.get();
-    donadorFinal.setCategoria(categoria);
+  public DonadorDTO modifcarCategoria(String donadorID, String categoria) {
+    if (categoria == null) throw new IllegalArgumentException("La categoría no puede ser nula");
 
-    this.donadoresRepository.deleteById(donadorID);
-    this.donadoresRepository.save(donadorFinal);
+    Donador donador = this.obtenerDonador(donadorID);
+    donador.setCategoria(categoria);
 
-    return donadoresYEntidadesDataMapper.toDonadorDTO(donadorFinal);
+    return this.donadorAssembler.toDTO(this.donadoresRepository.update(donador));
   }
 
   @Override
-  public void setFachadaIncentivos(FachadaIncentivos fachadaIncentivos) {}
-
-  @Override
-  public Boolean puedeDonar(String donadorID) throws NoSuchElementException {
-    // A implementar por el alumno
-    return null;
+  public void setFachadaIncentivos(FachadaIncentivos fachadaIncentivos) {
+    this.fachadaIncentivos = fachadaIncentivos;
   }
 
   @Override
-  public List<NecesidadMaterialDTO> obtenerNecesidadesInsatisfechasDe(String productoSolicitadoID) {
-    // A implementar por el alumno
-    return List.of();
+  public Boolean puedeDonar(String donadorID) {
+    return this.obtenerDonador(donadorID).puedeDonar();
   }
 
   @Override
-  public List<QuejaDTO> obtenerQuejasDe(String donadorID) throws NoSuchElementException {
-    // A implementar por el alumno
-    return List.of();
+  public List<NecesidadMaterialDTO> obtenerNecesidadesInsatisfechasDe(String productoSolicitado) {
+    if (productoSolicitado == null || productoSolicitado.isBlank())
+      throw new IllegalArgumentException("El producto solicitado no puede ser nulo o vacío");
+
+    return this.necesidadesRepository.findAll().stream()
+            .filter(necesidadMaterial -> necesidadMaterial.esDeProducto(productoSolicitado))
+            .map(this.necesidadAssembler::toDTO)
+            .toList();
   }
 
   @Override
-  public NecesidadMaterialDTO satisfacerNecesidad(String necesidadID, Integer cantidad)
-      throws NoSuchElementException {
-    // A implementar por el alumno
-    return null;
+  public List<QuejaDTO> obtenerQuejasDe(String donadorID) {
+    Donador donador = this.obtenerDonador(donadorID);
+    return this.quejasRepository.findAll().stream()
+            .filter(queja -> queja.esDeDonador(donador))
+            .map(this.quejaAssembler::toDTO)
+            .toList();
   }
 
   @Override
-  public DonadorStatsDTO estadisticasDonador(String donadorID) {
-    return null;
+  public NecesidadMaterialDTO satisfacerNecesidad(String necesidadID, Integer cantidad) {
+    NecesidadMaterial necesidad =
+            this.necesidadesRepository
+                    .findById(necesidadID)
+                    .orElseThrow(
+                            () -> new NecesidadNoEncontradaException("No existe una necesidad con ese ID"));
+
+    necesidad.satisfacer(cantidad);
+    return this.necesidadAssembler.toDTO(this.necesidadesRepository.update(necesidad));
   }
+
+  @Override
+  public DonadorStatsDTO estadisticasDonador(String donadorID) throws NoSuchElementException {
+    if (this.fachadaIncentivos == null)
+      throw new IllegalArgumentException("La fachada de incentivos no ha sido seteada");
+    List<Insignia> insignias =
+            this.fachadaIncentivos.getInsigniasDeDonador(donadorID).stream()
+                    .map(this.insigniaMapper::map)
+                    .toList();
+
+    Donador donador = this.obtenerDonador(donadorID);
+    MisionDTO misionDTO = this.fachadaIncentivos.getMisionEnCursoDeDonador(donadorID);
+    Mision mision = this.misionMapper.map(misionDTO);
+
+    DonadorStats donadorStats =
+            this.donadorStatsTransformer.crearDonadorStatsCon(donador, mision, insignias);
+    return this.donadorStatsDTOMapper.map(donadorStats);
+  }
+
 
   @Override
   public EntidadBeneficaDTO agregarEntidad(EntidadBeneficaDTO entidadBeneficaDTO) {
-    // A implementar por el alumno
-    return null;
+    if (entidadBeneficaDTO == null)
+      throw new IllegalArgumentException("La entidad benéfica no puede ser nula");
+
+    EntidadBenefica entidadBeneficaGuardada =
+            this.entidadesRepository.save(this.entidadAssembler.toDomain(entidadBeneficaDTO));
+    return this.entidadAssembler.toDTO(entidadBeneficaGuardada);
+  }
+
+  public List<EntidadBeneficaDTO> obtenerEntidades() {
+    return this.entidadesRepository.findAll().stream()
+            .map(this.entidadAssembler::toDTO)
+            .toList();
   }
 
   @Override
-  public EntidadBeneficaDTO buscarEntidadPorID(String entidadID) throws NoSuchElementException {
-    // A implementar por el alumno
-    return null;
+  public EntidadBeneficaDTO buscarEntidadPorID(String entidadID) {
+    return this.entidadAssembler.toDTO(this.obtenerEntidadBenefica(entidadID));
   }
 
   @Override
   public NecesidadMaterialDTO registrarNecesidad(NecesidadMaterialDTO necesidadMaterialDTO) {
-    // A implementar por el alumno
-    return null;
+    if (necesidadMaterialDTO == null)
+      throw new IllegalArgumentException("La necesidad no puede ser nula");
+
+    NecesidadMaterial necesidad =
+            this.necesidadesRepository.save(this.necesidadAssembler.toDomain(necesidadMaterialDTO));
+    return this.necesidadAssembler.toDTO(necesidad);
   }
 
   @Override
-  public QuejaDTO agregarQueja(QuejaDTO quejaDTO) throws NoSuchElementException {
-    // A implementar por el alumno
-    return null;
+  public QuejaDTO agregarQueja(QuejaDTO quejaDTO) {
+    if (quejaDTO == null) throw new IllegalArgumentException("La queja no puede ser nula");
+
+    Queja queja = this.quejasRepository.save(this.quejaAssembler.toDomain(quejaDTO));
+//    Donador donador = this.obtenerDonador(queja.getDonadorID());
+//    donador.agregarQueja(queja);
+
+    return this.quejaAssembler.toDTO(queja);
+  }
+
+  private Donador obtenerDonador(String donadorID) {
+    if (donadorID == null || donadorID.isBlank())
+      throw new IllegalArgumentException("El ID del donador no puede ser nulo o vacío");
+
+    return this.donadoresRepository
+            .findById(donadorID)
+            .orElseThrow(() -> new DonadorNoEncontradoException("No existe un donador con ese ID"));
+  }
+
+  private EntidadBenefica obtenerEntidadBenefica(String entidadID) {
+    if (entidadID == null || entidadID.isBlank())
+      throw new IllegalArgumentException("El ID de la entidad benéfica no puede ser nulo o vacío");
+
+    return this.entidadesRepository
+            .findById(entidadID)
+            .orElseThrow(
+                    () -> new EntidadNoEncontradaException("No existe una entidad benéfica con ese ID"));
   }
 }
