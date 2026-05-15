@@ -8,13 +8,15 @@
 ---
 
 🧩 Componente Desarrollado
--
-
+- Donadores y Entidades
 ---
 
 🧩 Link al despliegue en Render
--
+- https://agusb1101-donadores-entidades.onrender.com
+---
 
+🧩 Link al Swagger
+- https://app.swaggerhub.com/apis/utn-5f2/donadores-y-entidades-agusb1101/1.0
 ---
 
 ### ⚠️ Importante
