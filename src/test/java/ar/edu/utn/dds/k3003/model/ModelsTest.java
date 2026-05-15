@@ -1,7 +1,6 @@
 package ar.edu.utn.dds.k3003.model;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
-import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.CategoriaDonadorEnum;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,13 +68,7 @@ public class ModelsTest {
   @Test
   void testDonador_agregarQuejaTransitionsToSuspiciousAndBannedAndGetQuejasReturnsAll() {
     for (int i = 0; i < 5; i++) {
-      Queja queja = new Queja(
-              "complaint-" + i,
-              "donation-id",
-              donador.getId(),
-              LocalDate.now(),
-              "complaint description " + i);
-      donador.agregarQueja(queja);
+      donador.agregarQueja();
     }
 
     Assertions.assertEquals(EstadoDonadorEnum.SOSPECHOSO, donador.getEstado());
@@ -92,19 +85,10 @@ public class ModelsTest {
 
 
     for (int i = 5; i < 10; i++) {
-      Queja queja = new Queja(
-              "complaint-" + i,
-              "donation-id",
-              donador.getId(),
-              LocalDate.now(),
-              "complaint description " + i);
-      donador.agregarQueja(queja);
+      donador.agregarQueja();
     }
 
     Assertions.assertEquals(EstadoDonadorEnum.BANEADO, donador.getEstado());
-    for (int i = 0; i < 10; i++) {
-     Assertions.assertEquals("complaint-" + i, donador.getQuejas().get(i).getId());
-    }
   }
 
   @Test
@@ -161,14 +145,5 @@ public class ModelsTest {
 
     Assertions.assertEquals("DONOR-ID", donador.getId());
     Assertions.assertTrue(queja.esDeDonador(donador));
-  }
-
-  @Test
-  void testEntidadBenefica_agregarNecesidadAndObtenerNecesidadesInsatisfechasWorks() {
-    entidad.agregarNecesidadInsatisfecha(necesidad);
-
-    List<NecesidadMaterial> necesidades = entidad.getNecesidadesInsatisfechas();
-    Assertions.assertEquals(1, necesidades.size());
-    Assertions.assertEquals(necesidad.getId(), necesidades.getFirst().getId());
   }
 }

@@ -26,7 +26,8 @@ public class Donador extends Persistable {
   private List<EstadoDonadorEnum> historialEstados = new ArrayList<>();
 
   @Setter(AccessLevel.NONE)
-  private List<Queja> quejas = new ArrayList<>();
+  @Getter(AccessLevel.NONE)
+  private int cantidadQuejas = 0;
 
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
@@ -49,6 +50,8 @@ public class Donador extends Persistable {
     this.domicilio = domicilio;
     this.estado = EstadoDonadorEnum.VERIFICADO;
     this.categoria = CategoriaDonadorEnum.OCASIONAL.name();
+
+    this.agregarEstadoAHistorial(estado);
   }
 
   public Donador(
@@ -72,7 +75,7 @@ public class Donador extends Persistable {
     this.estado = estado;
     this.categoria = categoria;
 
-    this.agregarEstadoAHistorial();
+    this.agregarEstadoAHistorial(estado);
   }
 
   public boolean puedeDonar() {
@@ -85,30 +88,27 @@ public class Donador extends Persistable {
 
   public void setEstado(EstadoDonadorEnum estado) {
     this.estado = estado;
-    this.agregarEstadoAHistorial();
+    this.agregarEstadoAHistorial(estado);
   }
 
-  public void agregarQueja(Queja queja) {
-    this.quejas.add(queja);
+  public void agregarQueja() {
+    this.cantidadQuejas += 1;
     this.validarCantidadQuejas();
   }
 
   private void validarCantidadQuejas() {
-    int cantidadQuejas = this.quejas.size();
-
-    if (cantidadQuejas >= 10) {
-      this.estado = EstadoDonadorEnum.BANEADO;
-      this.agregarEstadoAHistorial();
+    if (this.cantidadQuejas >= 10) {
+      this.setEstado(EstadoDonadorEnum.BANEADO);
       return;
     }
 
-    if (cantidadQuejas >= 5) {
-      this.estado = EstadoDonadorEnum.SOSPECHOSO;
-      this.agregarEstadoAHistorial();
+    if (this.cantidadQuejas >= 5) {
+      this.setEstado(EstadoDonadorEnum.SOSPECHOSO);
     }
   }
 
-  private void agregarEstadoAHistorial() {
+  private void agregarEstadoAHistorial(EstadoDonadorEnum estado) {
+    if (!this.historialEstados.isEmpty() && this.historialEstados.getLast().equals(estado)) return;
     this.historialEstados.add(this.estado);
   }
 }

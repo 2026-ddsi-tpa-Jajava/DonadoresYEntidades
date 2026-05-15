@@ -15,9 +15,6 @@ public class EntidadBenefica extends Persistable {
   private String telefono;
   private String correo;
 
-  @Setter(AccessLevel.NONE)
-  private List<NecesidadMaterial> necesidadesInsatisfechas = new ArrayList<>();
-
   public EntidadBenefica(
       String id, String razonSocial, String domicilio, String telefono, String correo) {
     super(id);
@@ -25,9 +22,5 @@ public class EntidadBenefica extends Persistable {
     this.domicilio = domicilio;
     this.telefono = telefono;
     this.correo = correo;
-  }
-
-  public void agregarNecesidadInsatisfecha(NecesidadMaterial necesidad) {
-    this.necesidadesInsatisfechas.add(necesidad);
   }
 }

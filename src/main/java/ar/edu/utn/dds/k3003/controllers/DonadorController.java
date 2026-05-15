@@ -61,7 +61,7 @@ public class DonadorController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(this.fachada.modifcarCategoria(id, CategoriaDonadorEnum.valueOf(category).name()));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("El campo 'categoria' debe ser uno de los siguientes valores: " + "OCASIONAL', 'COLABORADOR','TRANSFORMADOR', 'SALVADOR' o 'REVOLUCIONARIO'");
+            throw new IllegalArgumentException("El campo 'categoria' debe ser uno de los siguientes valores: 'OCASIONAL', 'COLABORADOR','TRANSFORMADOR', 'SALVADOR' o 'REVOLUCIONARIO'");
         }
     }
 
@@ -87,7 +87,6 @@ public class DonadorController {
             throw new IllegalArgumentException("Solo se permiten los campos 'donacionID' y 'descripcion'");
 
         QuejaDTO complaint = new QuejaDTO(null, donationId, id, LocalDate.now(), description);
-
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.agregarQueja(complaint));
     }
 
