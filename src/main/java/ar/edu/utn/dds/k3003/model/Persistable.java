@@ -9,7 +9,6 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class Persistable {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
   private String id;
 

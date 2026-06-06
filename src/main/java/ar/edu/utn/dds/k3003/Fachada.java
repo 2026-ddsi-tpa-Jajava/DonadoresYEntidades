@@ -4,6 +4,7 @@ import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaDonadoresYEntidades;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaIncentivos;
+import ar.edu.utn.dds.k3003.clients.IncentivosApiClient;
 import ar.edu.utn.dds.k3003.exceptions.DonadorNoEncontradoException;
 import ar.edu.utn.dds.k3003.exceptions.EntidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
@@ -34,20 +35,24 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final DonadorStatsDTOMapper donadorStatsDTOMapper = new DonadorStatsDTOMapper();
     private FachadaIncentivos fachadaIncentivos;
 
+    private final IncentivosApiClient incentivosApiClient;
+
     @Autowired
     public Fachada(
             DonadoresRepository donadoresRepository,
             EntidadesRepository entidadesRepository,
             QuejasRepository quejasRepository,
-            NecesidadesRepository necesidadesRepository) {
+            NecesidadesRepository necesidadesRepository, IncentivosApiClient incentivosApiClient) {
         this.donadoresRepository = donadoresRepository;
         this.entidadesRepository = entidadesRepository;
         this.quejasRepository = quejasRepository;
         this.necesidadesRepository = necesidadesRepository;
+        this.incentivosApiClient = incentivosApiClient;
     }
 
     // Constructor por defecto para uso en tests o ejecución sin Spring
     public Fachada() {
+        this.incentivosApiClient = new IncentivosApiClient();
         this.donadoresRepository = new InMemoryDonadoresRepo();
         this.entidadesRepository = new InMemoryEntidadesRepo();
         this.quejasRepository = new InMemoryQuejasRepo();
@@ -136,15 +141,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     @Override
     public DonadorStatsDTO estadisticasDonador(String donadorID) throws NoSuchElementException {
-        if (this.fachadaIncentivos == null)
-            throw new IllegalArgumentException("La fachada de incentivos no ha sido seteada");
         List<Insignia> insignias =
-                this.fachadaIncentivos.getInsigniasDeDonador(donadorID).stream()
+                this.incentivosApiClient.obtenerInsigniaPorDonador(donadorID).stream()
                         .map(this.insigniaMapper::map)
                         .toList();
 
         Donador donador = this.obtenerDonador(donadorID);
-        MisionDTO misionDTO = this.fachadaIncentivos.getMisionEnCursoDeDonador(donadorID);
+        MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionPorDonador(donadorID);
         Mision mision = this.misionMapper.map(misionDTO);
 
         DonadorStats donadorStats =
