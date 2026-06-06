@@ -1,6 +1,6 @@
 package ar.edu.utn.dds.k3003.model;
 
-0000000000000000000import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +9,7 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class Persistable {
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
   private String id;
 
