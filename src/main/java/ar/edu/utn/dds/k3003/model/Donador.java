@@ -2,14 +2,7 @@ package ar.edu.utn.dds.k3003.model;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.CategoriaDonadorEnum;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +44,11 @@ public class Donador extends Persistable {
   @OneToMany(mappedBy = "donador", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Queja> quejas = new ArrayList<>();
 
-  @Transient
+  @ElementCollection
+  @CollectionTable(name = "historial_estados", joinColumns = @JoinColumn(name = "donador_id"))
+  @Column(name = "estado")
+  @Enumerated(EnumType.STRING)
+  @OrderColumn(name = "orden")
   @Setter(AccessLevel.NONE)
   private List<EstadoDonadorEnum> historialEstados = new ArrayList<>();
 
