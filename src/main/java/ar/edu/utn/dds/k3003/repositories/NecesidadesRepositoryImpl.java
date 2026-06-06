@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class NecesidadesRepositoryImpl implements NecesidadesRepository {
 
   private final NecesidadesJpaRepository jpaRepository;
+  private final AtomicLong idSecuencial = new AtomicLong(1);
 
   @Autowired
   public NecesidadesRepositoryImpl(NecesidadesJpaRepository jpaRepository) {
@@ -30,6 +31,7 @@ public class NecesidadesRepositoryImpl implements NecesidadesRepository {
     if (necesidad.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
 
+    necesidad.setId(String.valueOf(idSecuencial.getAndIncrement()));
     return jpaRepository.save(necesidad);
   }
 

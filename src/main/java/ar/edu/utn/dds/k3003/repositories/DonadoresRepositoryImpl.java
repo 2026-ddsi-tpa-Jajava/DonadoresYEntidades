@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DonadoresRepositoryImpl implements DonadoresRepository {
 
   private final DonadoresJpaRepository jpaRepository;
+  private final AtomicLong idSecuencial = new AtomicLong(1);
 
   public DonadoresRepositoryImpl(DonadoresJpaRepository jpaRepository) {
     this.jpaRepository = jpaRepository;
@@ -31,6 +32,8 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
     if (donador == null) throw new IllegalArgumentException("El donador no puede ser nulo");
     if (donador.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
+
+    donador.setId(String.valueOf(idSecuencial.getAndIncrement()));
     return jpaRepository.save(donador);
   }
 
