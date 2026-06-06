@@ -10,6 +10,7 @@ import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.mappers.*;
 import ar.edu.utn.dds.k3003.model.*;
 import ar.edu.utn.dds.k3003.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +34,19 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final DonadorStatsDTOMapper donadorStatsDTOMapper = new DonadorStatsDTOMapper();
     private FachadaIncentivos fachadaIncentivos;
 
+    @Autowired
+    public Fachada(
+            DonadoresRepository donadoresRepository,
+            EntidadesRepository entidadesRepository,
+            QuejasRepository quejasRepository,
+            NecesidadesRepository necesidadesRepository) {
+        this.donadoresRepository = donadoresRepository;
+        this.entidadesRepository = entidadesRepository;
+        this.quejasRepository = quejasRepository;
+        this.necesidadesRepository = necesidadesRepository;
+    }
+
+    // Constructor por defecto para uso en tests o ejecución sin Spring
     public Fachada() {
         this.donadoresRepository = new InMemoryDonadoresRepo();
         this.entidadesRepository = new InMemoryEntidadesRepo();
@@ -177,6 +191,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         Queja queja = this.quejasRepository.save(this.quejaAssembler.toDomain(quejaDTO));
         Donador donador = this.obtenerDonador(queja.getDonadorID());
         donador.agregarQueja();
+        this.donadoresRepository.update(donador);
 
         return this.quejaAssembler.toDTO(queja);
     }
