@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class QuejasRepositoryImpl implements QuejasRepository {
 
   private final QuejasJpaRepository jpaRepository;
-  private final AtomicLong incrementalId = new AtomicLong(1);
 
   @Autowired
   public QuejasRepositoryImpl(QuejasJpaRepository jpaRepository) {
@@ -31,7 +30,6 @@ public class QuejasRepositoryImpl implements QuejasRepository {
     if (queja.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
 
-    queja.setId("queja" + incrementalId.getAndIncrement());
     return jpaRepository.save(queja);
   }
 
