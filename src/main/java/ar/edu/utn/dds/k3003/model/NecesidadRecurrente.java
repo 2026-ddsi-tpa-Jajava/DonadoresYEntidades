@@ -1,6 +1,15 @@
 package ar.edu.utn.dds.k3003.model;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("recurrente")
 public class NecesidadRecurrente extends NecesidadMaterial {
+    public NecesidadRecurrente() {
+        // Constructor vacío requerido por JPA
+    }
+
     public NecesidadRecurrente(String id,
                                String entidadID,
                                Integer nivelDeUrgencia,
@@ -14,5 +23,6 @@ public class NecesidadRecurrente extends NecesidadMaterial {
         if (cantidad < this.getCantidadObjetivo())
             throw new IllegalArgumentException("La cantidad a donar no puede ser menor a la cantidad objetivo");
         this.cantidadDonada += cantidad;
+        this.actualizarSatisfaccion();
     }
 }

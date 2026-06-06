@@ -11,7 +11,7 @@ public class QuejaAssembler implements Assembler<Queja, QuejaDTO> {
         quejaDTO.id(),
         quejaDTO.donacionID(),
         quejaDTO.donadorID(),
-        quejaDTO.fecha(),
+        quejaDTO.fecha() != null ? quejaDTO.fecha().atStartOfDay() : null,
         quejaDTO.descripcion());
   }
 
@@ -21,7 +21,7 @@ public class QuejaAssembler implements Assembler<Queja, QuejaDTO> {
         queja.getId(),
         queja.getDonacionID(),
         queja.getDonadorID(),
-        queja.getFecha(),
+        queja.getFecha() != null ? queja.getFecha().toLocalDate() : null,
         queja.getDescripcion());
   }
 }

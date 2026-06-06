@@ -1,6 +1,15 @@
 package ar.edu.utn.dds.k3003.model;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("extraordinaria")
 public class NecesidadExtraordinaria extends NecesidadMaterial {
+    public NecesidadExtraordinaria() {
+        // Constructor vacío requerido por JPA
+    }
+
     public NecesidadExtraordinaria(String id,
                                    String entidadID,
                                    Integer nivelDeUrgencia,
@@ -14,5 +23,6 @@ public class NecesidadExtraordinaria extends NecesidadMaterial {
         if (cantidad <= 0)
             throw new IllegalArgumentException("La cantidad a donar no puede ser menor o igual a cero");
         this.cantidadDonada += cantidad;
+        this.actualizarSatisfaccion();
     }
 }
