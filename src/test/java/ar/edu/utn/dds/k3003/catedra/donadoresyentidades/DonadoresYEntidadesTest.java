@@ -305,7 +305,7 @@ public class DonadoresYEntidadesTest {
   void testModificarCategoria() {
 
     DonadorDTO retorno = instancia.agregarDonador(donadorEjemplo);
-    DonadorDTO actualizado = instancia.modifcarCategoria(retorno.id(), "CategoriaNueva");
+    DonadorDTO actualizado = instancia.modificarCategoria(retorno.id(), "CategoriaNueva");
 
     Assertions.assertNotNull(actualizado);
     Assertions.assertEquals(
@@ -317,7 +317,7 @@ public class DonadoresYEntidadesTest {
     Assertions.assertThrows(
         RuntimeException.class,
         () -> {
-          instancia.modifcarCategoria("Inexistente", "Categoria1");
+          instancia.modificarCategoria("Inexistente", "Categoria1");
         });
 
     DonadorDTO retorno = instancia.agregarDonador(donadorEjemplo);
@@ -325,7 +325,7 @@ public class DonadoresYEntidadesTest {
     Assertions.assertThrows(
         RuntimeException.class,
         () -> {
-          instancia.modifcarCategoria(retorno.id(), null);
+          instancia.modificarCategoria(retorno.id(), null);
         });
   }
 
