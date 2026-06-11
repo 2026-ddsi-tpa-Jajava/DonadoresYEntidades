@@ -59,7 +59,7 @@ public class DonadorController {
         if (request.size() > 1) throw new IllegalArgumentException("Solo se permite modificar el campo 'categoria'");
 
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(this.fachada.modifcarCategoria(id, CategoriaDonadorEnum.valueOf(category).name()));
+            return ResponseEntity.status(HttpStatus.OK).body(this.fachada.modificarCategoria(id, CategoriaDonadorEnum.valueOf(category).name()));
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("El campo 'categoria' debe ser uno de los siguientes valores: 'OCASIONAL', 'COLABORADOR','TRANSFORMADOR', 'SALVADOR' o 'REVOLUCIONARIO'");
         }

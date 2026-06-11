@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class Fachada implements FachadaDonadoresYEntidades {
@@ -33,8 +32,6 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final InsigniaMapper insigniaMapper = new InsigniaMapper();
     private final MisionMapper misionMapper = new MisionMapper();
     private final DonadorStatsDTOMapper donadorStatsDTOMapper = new DonadorStatsDTOMapper();
-    private FachadaIncentivos fachadaIncentivos;
-
     private final IncentivosApiClient incentivosApiClient;
 
     @Autowired
@@ -88,7 +85,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     @Override
-    public DonadorDTO modifcarCategoria(String donadorID, String categoria) {
+    public DonadorDTO modificarCategoria(String donadorID, String categoria) {
         if (categoria == null) throw new IllegalArgumentException("La categoría no puede ser nula");
 
         Donador donador = this.obtenerDonador(donadorID);
@@ -98,9 +95,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     @Override
-    public void setFachadaIncentivos(FachadaIncentivos fachadaIncentivos) {
-        this.fachadaIncentivos = fachadaIncentivos;
-    }
+    public void setFachadaIncentivos(FachadaIncentivos fachadaIncentivos) {}
 
     @Override
     public Boolean puedeDonar(String donadorID) {
@@ -140,18 +135,16 @@ public class Fachada implements FachadaDonadoresYEntidades {
     }
 
     @Override
-    public DonadorStatsDTO estadisticasDonador(String donadorID) throws NoSuchElementException {
-        List<Insignia> insignias =
-                this.incentivosApiClient.obtenerInsigniaPorDonador(donadorID).stream()
-                        .map(this.insigniaMapper::map)
-                        .toList();
-
+    public DonadorStatsDTO estadisticasDonador(String donadorID) {
         Donador donador = this.obtenerDonador(donadorID);
-        MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionPorDonador(donadorID);
+        List<Insignia> insignias = this.incentivosApiClient.obtenerInsigniasDeDonador(donadorID).stream()
+                .map(this.insigniaMapper::map)
+                .toList();
+
+        MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionActualDeDonador(donadorID);
         Mision mision = this.misionMapper.map(misionDTO);
 
-        DonadorStats donadorStats =
-                this.donadorStatsTransformer.crearDonadorStatsCon(donador, mision, insignias);
+        DonadorStats donadorStats = this.donadorStatsTransformer.crearDonadorStatsCon(donador, mision, insignias);
         return this.donadorStatsDTOMapper.map(donadorStats);
     }
 
