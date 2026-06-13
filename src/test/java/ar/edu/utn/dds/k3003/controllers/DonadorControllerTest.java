@@ -119,13 +119,13 @@ public class DonadorControllerTest {
   void modifyCategoryReturnsOkAndDelegatesParsedCategory() {
 	DonadorDTO response = new DonadorDTO("donador-1", "Juan", "Pérez", 30, "juan@example.com", "12345678", "Calle 1", EstadoDonadorEnum.VERIFICADO, CategoriaDonadorEnum.COLABORADOR.name());
 
-	when(fachada.modifcarCategoria("donador-1", CategoriaDonadorEnum.COLABORADOR.name())).thenReturn(response);
+	when(fachada.modificarCategoria("donador-1", CategoriaDonadorEnum.COLABORADOR.name())).thenReturn(response);
 
 	var result = controller.modifyCategory("donador-1", Map.of("categoria", "COLABORADOR"));
 
 	Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
 	Assertions.assertEquals(response, result.getBody());
-	verify(fachada).modifcarCategoria("donador-1", CategoriaDonadorEnum.COLABORADOR.name());
+	verify(fachada).modificarCategoria("donador-1", CategoriaDonadorEnum.COLABORADOR.name());
   }
 
   @Test

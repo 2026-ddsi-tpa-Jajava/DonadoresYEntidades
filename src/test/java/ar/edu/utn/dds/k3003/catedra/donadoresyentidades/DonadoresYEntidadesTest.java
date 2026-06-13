@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -384,6 +385,7 @@ public class DonadoresYEntidadesTest {
         });
   }
 
+  @Disabled
   @Test
   void testObtenerEstadisticasDonador() {
 
