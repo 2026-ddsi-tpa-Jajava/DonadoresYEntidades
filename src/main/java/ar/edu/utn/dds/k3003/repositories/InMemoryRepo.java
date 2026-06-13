@@ -54,4 +54,8 @@ public abstract class InMemoryRepo<T extends Persistable> {
   public List<T> findAll() {
     return new ArrayList<>(this.storage.values());
   }
+
+  public void deleteAll() {
+    this.storage.clear();
+    }
 }

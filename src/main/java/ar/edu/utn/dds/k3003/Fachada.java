@@ -11,7 +11,9 @@ import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.mappers.*;
 import ar.edu.utn.dds.k3003.model.*;
 import ar.edu.utn.dds.k3003.repositories.*;
+import io.micrometer.core.instrument.Metrics;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Metric;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,6 +62,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     public DonadorDTO agregarDonador(DonadorDTO donadorDTO) {
         if (donadorDTO == null) throw new IllegalArgumentException("El donador no puede ser nulo");
         Donador donador = this.donadoresRepository.save(this.nuevoDonadorMapper.map(donadorDTO));
+        Metrics.counter("donadores.registrados").increment();
         return this.donadorAssembler.toDTO(donador);
     }
 
@@ -67,6 +70,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
         return this.donadoresRepository.findAll().stream()
                 .map(this.donadorAssembler::toDTO)
                 .toList();
+    }
+
+    public void eliminarTodosLosDonadores() {
+        this.donadoresRepository.deleteAll();
     }
 
     @Override
@@ -131,12 +138,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
                                 () -> new NecesidadNoEncontradaException("No existe una necesidad con ese ID"));
 
         necesidad.satisfacer(cantidad);
+        Metrics.counter("necesidades.satisfechas").increment();
         return this.necesidadAssembler.toDTO(this.necesidadesRepository.update(necesidad));
     }
 
     @Override
     public DonadorStatsDTO estadisticasDonador(String donadorID) {
         Donador donador = this.obtenerDonador(donadorID);
+
         List<Insignia> insignias = this.incentivosApiClient.obtenerInsigniasDeDonador(donadorID).stream()
                 .map(this.insigniaMapper::map)
                 .toList();
@@ -145,7 +154,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         Mision mision = this.misionMapper.map(misionDTO);
 
         DonadorStats donadorStats = this.donadorStatsTransformer.crearDonadorStatsCon(donador, mision, insignias);
-        return this.donadorStatsDTOMapper.map(donadorStats);
+         return this.donadorStatsDTOMapper.map(donadorStats);
     }
 
 
@@ -156,6 +165,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         EntidadBenefica entidadBeneficaGuardada =
                 this.entidadesRepository.save(this.entidadAssembler.toDomain(entidadBeneficaDTO));
+        Metrics.counter("entidades.registradas").increment();
         return this.entidadAssembler.toDTO(entidadBeneficaGuardada);
     }
 
@@ -163,6 +173,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
         return this.entidadesRepository.findAll().stream()
                 .map(this.entidadAssembler::toDTO)
                 .toList();
+    }
+
+    public void eliminarTodasLasEntidades() {
+        this.entidadesRepository.deleteAll();
     }
 
     @Override
@@ -177,7 +191,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         NecesidadMaterial necesidad =
                 this.necesidadesRepository.save(this.necesidadAssembler.toDomain(necesidadMaterialDTO));
+        Metrics.counter("necesidades.registradas").increment();
         return this.necesidadAssembler.toDTO(necesidad);
+    }
+
+    public void eliminarTodasLasNecesidades() {
+        this.necesidadesRepository.deleteAll();
     }
 
     @Override
@@ -188,8 +207,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
         Donador donador = this.obtenerDonador(queja.getDonadorID());
         donador.agregarQueja();
         this.donadoresRepository.update(donador);
-
+        Metrics.counter("quejas.registradas").increment();
         return this.quejaAssembler.toDTO(queja);
+    }
+
+    public void eliminarTodasLasQuejas() {
+        this.quejasRepository.deleteAll();
     }
 
     private Donador obtenerDonador(String donadorID) {

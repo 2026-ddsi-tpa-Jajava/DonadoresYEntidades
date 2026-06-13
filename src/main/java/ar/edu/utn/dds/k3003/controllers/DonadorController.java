@@ -34,6 +34,12 @@ public class DonadorController {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.obtenerDonadores());
     }
 
+    @RequestMapping(method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteAllDonors() {
+       this.fachada.eliminarTodosLosDonadores();
+       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<DonadorDTO> getDonorById(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.buscarDonadorPorID(id));
@@ -93,5 +99,11 @@ public class DonadorController {
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/quejas")
     public ResponseEntity<List<QuejaDTO>> getComplaints(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.obtenerQuejasDe(id));
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteAllComplaints() {
+        this.fachada.eliminarTodasLasQuejas();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

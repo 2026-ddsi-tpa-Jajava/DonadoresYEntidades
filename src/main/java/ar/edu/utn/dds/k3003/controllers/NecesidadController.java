@@ -1,6 +1,7 @@
 package ar.edu.utn.dds.k3003.controllers;
 
 import ar.edu.utn.dds.k3003.Fachada;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,11 @@ public class NecesidadController {
         if (request.size() > 1) throw new IllegalArgumentException("Solo se permite modificar el campo 'cantidad'");
 
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.satisfacerNecesidad(id, quantity));
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteAllNeeds() {
+        this.fachada.eliminarTodasLasNecesidades();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

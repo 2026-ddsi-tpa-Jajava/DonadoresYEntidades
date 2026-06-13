@@ -15,4 +15,6 @@ public interface EntidadesRepository {
   EntidadBenefica deleteById(String id);
 
   List<EntidadBenefica> findAll();
+
+  void deleteAll();
 }

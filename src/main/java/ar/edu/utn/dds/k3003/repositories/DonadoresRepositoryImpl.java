@@ -63,5 +63,10 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
   public List<Donador> findAll() {
     return jpaRepository.findAll();
   }
+
+  @Override
+  public void deleteAll() {
+    jpaRepository.deleteAll();
+  }
 }
 

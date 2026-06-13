@@ -9,7 +9,6 @@ import java.util.List;
 @Setter
 @Getter
 public class DonadorStats extends Persistable {
-  private String id;
   private String nombre;
   private String apellido;
   private Integer edad;

@@ -14,4 +14,6 @@ public interface NecesidadesRepository {
   NecesidadMaterial deleteById(String id);
 
   List<NecesidadMaterial> findAll();
+
+  void deleteAll();
 }

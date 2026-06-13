@@ -14,4 +14,6 @@ public interface QuejasRepository {
   Queja deleteById(String id);
 
   List<Queja> findAll();
+
+  void deleteAll();
 }

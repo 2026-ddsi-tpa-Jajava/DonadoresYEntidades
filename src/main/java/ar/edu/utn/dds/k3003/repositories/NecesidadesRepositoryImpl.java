@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.repositories;
 
+import ar.edu.utn.dds.k3003.model.Donador;
 import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,6 +60,11 @@ public class NecesidadesRepositoryImpl implements NecesidadesRepository {
   @Override
   public List<NecesidadMaterial> findAll() {
     return jpaRepository.findAll();
+  }
+
+  @Override
+  public void deleteAll() {
+    jpaRepository.deleteAll();
   }
 }
 

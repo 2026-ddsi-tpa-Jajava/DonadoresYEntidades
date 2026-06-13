@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.repositories;
 
+import ar.edu.utn.dds.k3003.model.Donador;
 import ar.edu.utn.dds.k3003.model.Queja;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,6 +60,11 @@ public class QuejasRepositoryImpl implements QuejasRepository {
   @Override
   public List<Queja> findAll() {
     return jpaRepository.findAll();
+  }
+
+  @Override
+  public void deleteAll() {
+    jpaRepository.deleteAll();
   }
 }
 
