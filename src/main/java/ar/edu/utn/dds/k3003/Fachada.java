@@ -381,13 +381,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
             log.info(
                     "📦 Creando asignación de stock para necesidad recurrente: necesidadID={}, productoID={}, cantidad={}",
                     necesidad.getId(), productoID, necesidad.getCantidadObjetivo());
-            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidad.getId()), necesidad.getProductoSolicitadoID(), necesidad.getCantidadObjetivo());
+            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidadGuardada.getId()), necesidad.getProductoSolicitadoID(), necesidad.getCantidadObjetivo());
         } else if (necesidad instanceof NecesidadExtraordinaria && cantidadEnStock > 0) {
             int cantidadAAsignar = Math.min(cantidadEnStock, necesidad.getCantidadObjetivo());
             log.info(
                     "📦 Creando asignación de stock para necesidad extraordinaria: necesidadID={}, productoID={}, cantidad={}",
                     necesidad.getId(), productoID, cantidadAAsignar);
-            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidad.getId()), necesidad.getProductoSolicitadoID(), cantidadAAsignar);
+            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidadGuardada.getId()), necesidad.getProductoSolicitadoID(), cantidadAAsignar);
         }
 
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(necesidadGuardada);

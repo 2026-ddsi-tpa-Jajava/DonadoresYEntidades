@@ -29,7 +29,7 @@ public class LogisticaApiClient {
         Map<String, String> request = new HashMap<>();
         request.put("necesidadID", necesidadID);
         request.put("productoID", productoID);
-        request.put("cantidad", String.valueOf(cantidad));
+        request.put("cantidadAsignada", String.valueOf(cantidad));
 
         return restClientBuilder.post(url, request, AsignacionDTO.class);
     }
