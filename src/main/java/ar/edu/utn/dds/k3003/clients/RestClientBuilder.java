@@ -27,4 +27,12 @@ public class RestClientBuilder {
                 .retrieve()
                 .body(typeReference); // RestClient ya soporta esto nativamente
     }
+
+    public <T, Q> T post(String uri, Q body,  Class<T> clazz) {
+        return restClient.post()
+                .uri(uri)
+                .body(body)
+                .retrieve()
+                .body(clazz);
+    }
 }

@@ -1,10 +1,13 @@
 package ar.edu.utn.dds.k3003;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.DonacionDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaDonadoresYEntidades;
 import ar.edu.utn.dds.k3003.catedra.fachadas.FachadaIncentivos;
+import ar.edu.utn.dds.k3003.clients.DonacionesApiClient;
 import ar.edu.utn.dds.k3003.clients.IncentivosApiClient;
+import ar.edu.utn.dds.k3003.clients.LogisticaApiClient;
 import ar.edu.utn.dds.k3003.exceptions.DonadorNoEncontradoException;
 import ar.edu.utn.dds.k3003.exceptions.EntidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
@@ -13,7 +16,6 @@ import ar.edu.utn.dds.k3003.model.*;
 import ar.edu.utn.dds.k3003.repositories.*;
 import io.micrometer.core.instrument.Metrics;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.geo.Metric;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,23 +37,32 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final MisionMapper misionMapper = new MisionMapper();
     private final DonadorStatsDTOMapper donadorStatsDTOMapper = new DonadorStatsDTOMapper();
     private final IncentivosApiClient incentivosApiClient;
+    private final DonacionesApiClient donacionesApiClient;
+    private final LogisticaApiClient logisticaApiClient;
 
     @Autowired
     public Fachada(
             DonadoresRepository donadoresRepository,
             EntidadesRepository entidadesRepository,
             QuejasRepository quejasRepository,
-            NecesidadesRepository necesidadesRepository, IncentivosApiClient incentivosApiClient) {
+            NecesidadesRepository necesidadesRepository,
+            IncentivosApiClient incentivosApiClient,
+            DonacionesApiClient donacionesApiClient,
+            LogisticaApiClient logisticaApiClient) {
         this.donadoresRepository = donadoresRepository;
         this.entidadesRepository = entidadesRepository;
         this.quejasRepository = quejasRepository;
         this.necesidadesRepository = necesidadesRepository;
         this.incentivosApiClient = incentivosApiClient;
+        this.donacionesApiClient = donacionesApiClient;
+        this.logisticaApiClient = logisticaApiClient;
     }
 
     // Constructor por defecto para uso en tests o ejecución sin Spring
     public Fachada() {
+        this.donacionesApiClient = new DonacionesApiClient();
         this.incentivosApiClient = new IncentivosApiClient();
+        this.logisticaApiClient = new LogisticaApiClient();
         this.donadoresRepository = new InMemoryDonadoresRepo();
         this.entidadesRepository = new InMemoryEntidadesRepo();
         this.quejasRepository = new InMemoryQuejasRepo();
@@ -189,10 +200,26 @@ public class Fachada implements FachadaDonadoresYEntidades {
         if (necesidadMaterialDTO == null)
             throw new IllegalArgumentException("La necesidad no puede ser nula");
 
-        NecesidadMaterial necesidad =
-                this.necesidadesRepository.save(this.necesidadAssembler.toDomain(necesidadMaterialDTO));
+        String productoID = necesidadMaterialDTO.productoSolicitadoID();
+
+        boolean esProductoValido = this.donacionesApiClient
+                .esProductoValido(productoID);
+
+        if (!esProductoValido)
+            throw new IllegalArgumentException("El producto solicitado no es válido");
+
+        NecesidadMaterial necesidad = this.necesidadAssembler.toDomain(necesidadMaterialDTO);
+        int cantidadEnStock = this.logisticaApiClient.cuantoStockHayDe(productoID);
+
+        if (necesidad instanceof NecesidadRecurrente && cantidadEnStock >= necesidad.getCantidadObjetivo()) {
+            this.logisticaApiClient.crearAsignacionStock(necesidad.getId(), necesidad.getProductoSolicitadoID(), necesidad.getCantidadObjetivo());
+        } else if (necesidad instanceof NecesidadExtraordinaria && cantidadEnStock > 0) {
+            this.logisticaApiClient.crearAsignacionStock(necesidad.getId(), necesidad.getProductoSolicitadoID(), Math.min(cantidadEnStock, necesidad.getCantidadObjetivo()));
+        }
+
+        NecesidadMaterial necesidadGuardada = this.necesidadesRepository.save(necesidad);
         Metrics.counter("necesidades.registradas").increment();
-        return this.necesidadAssembler.toDTO(necesidad);
+        return this.necesidadAssembler.toDTO(necesidadGuardada);
     }
 
     public void eliminarTodasLasNecesidades() {

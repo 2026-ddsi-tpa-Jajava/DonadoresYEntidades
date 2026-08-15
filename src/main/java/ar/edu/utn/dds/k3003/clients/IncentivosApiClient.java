@@ -2,6 +2,7 @@ package ar.edu.utn.dds.k3003.clients;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.InsigniaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +10,8 @@ import java.util.List;
 
 @Component
 public class IncentivosApiClient {
-    private final String BASE_URL = "https://incentivos-yuse.onrender.com";
+    @Value("${incentivos.api.base-url}")
+    private String BASE_URL;
     private final RestClientBuilder restClientBuilder = new RestClientBuilder(BASE_URL);
 
     public MisionDTO obtenerMisionActualDeDonador(String donadorID) {

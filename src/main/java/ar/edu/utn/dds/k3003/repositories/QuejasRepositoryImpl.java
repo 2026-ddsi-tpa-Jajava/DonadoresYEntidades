@@ -65,6 +65,7 @@ public class QuejasRepositoryImpl implements QuejasRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
+    idSecuencial.set(1);
   }
 }
 

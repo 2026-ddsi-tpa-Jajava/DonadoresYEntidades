@@ -67,6 +67,7 @@ public class EntidadesRepositoryImpl implements EntidadesRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
+    idSecuencial.set(1);
   }
 }
 

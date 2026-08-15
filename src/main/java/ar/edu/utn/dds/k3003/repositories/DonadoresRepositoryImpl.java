@@ -67,6 +67,7 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
+    idSecuencial.set(1);
   }
 }
 

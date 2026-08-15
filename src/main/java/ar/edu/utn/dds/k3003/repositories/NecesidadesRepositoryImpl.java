@@ -65,6 +65,7 @@ public class NecesidadesRepositoryImpl implements NecesidadesRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
+    idSecuencial.set(1);
   }
 }
 
