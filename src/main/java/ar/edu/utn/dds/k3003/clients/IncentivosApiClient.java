@@ -15,11 +15,15 @@ public class IncentivosApiClient {
     private final RestClientBuilder restClientBuilder = new RestClientBuilder(BASE_URL);
 
     public MisionDTO obtenerMisionActualDeDonador(String donadorID) {
+            if (BASE_URL == null || BASE_URL.isBlank()) return null;
+
             String url = BASE_URL + "/misiones/" + donadorID;
             return restClientBuilder.get(url, MisionDTO.class);
     }
 
     public List<InsigniaDTO> obtenerInsigniasDeDonador(String donadorID) {
+        if (BASE_URL == null || BASE_URL.isBlank()) return List.of();
+
         String url = BASE_URL + "/insignias/" + donadorID;
         return restClientBuilder.get(url, new ParameterizedTypeReference<>() {});
     }

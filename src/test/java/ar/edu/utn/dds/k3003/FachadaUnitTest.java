@@ -2,25 +2,50 @@ package ar.edu.utn.dds.k3003;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
+import ar.edu.utn.dds.k3003.clients.DonacionesApiClient;
+import ar.edu.utn.dds.k3003.clients.IncentivosApiClient;
+import ar.edu.utn.dds.k3003.clients.LogisticaApiClient;
 import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.model.NecesidadMaterial;
+import ar.edu.utn.dds.k3003.repositories.InMemoryDonadoresRepo;
+import ar.edu.utn.dds.k3003.repositories.InMemoryEntidadesRepo;
+import ar.edu.utn.dds.k3003.repositories.InMemoryNecesidadesRepo;
+import ar.edu.utn.dds.k3003.repositories.InMemoryQuejasRepo;
 import ar.edu.utn.dds.k3003.repositories.NecesidadesRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class FachadaUnitTest {
+
+  @Mock private DonacionesApiClient donacionesApiClient;
+  @Mock private IncentivosApiClient incentivosApiClient;
+  @Mock private LogisticaApiClient logisticaApiClient;
 
   private Fachada fachada;
 
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    fachada = new Fachada();
+    fachada = new Fachada(
+        new InMemoryDonadoresRepo(),
+        new InMemoryEntidadesRepo(),
+        new InMemoryQuejasRepo(),
+        new InMemoryNecesidadesRepo(),
+        incentivosApiClient,
+        donacionesApiClient,
+        logisticaApiClient);
   }
 
   @Test
@@ -37,6 +62,9 @@ public class FachadaUnitTest {
 
   @Test
   void testFachada_satisfacerNecesidadExitosa() throws NoSuchFieldException, IllegalAccessException {
+    when(donacionesApiClient.esProductoValido(anyString())).thenReturn(true);
+    when(logisticaApiClient.cuantoStockHayDe(anyString())).thenReturn(0);
+
     NecesidadMaterialDTO necesidadMaterialDTO = new NecesidadMaterialDTO(
             null,
             "charity-id",

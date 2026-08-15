@@ -15,11 +15,15 @@ public class LogisticaApiClient {
     private final RestClientBuilder restClientBuilder = new RestClientBuilder(BASE_URL);
 
     public int cuantoStockHayDe(String productoID) {
+        if (BASE_URL == null || BASE_URL.isBlank()) return 0;
+
         String url = BASE_URL + "/depositos/stock/" + productoID;
         return restClientBuilder.get(url, Integer.class);
     }
 
     public AsignacionDTO crearAsignacionStock(String necesidadID, String productoID, int cantidad) {
+        if (BASE_URL == null || BASE_URL.isBlank()) return null;
+
         String url = BASE_URL + "/asignaciones/stock";
 
         Map<String, String> request = new HashMap<>();

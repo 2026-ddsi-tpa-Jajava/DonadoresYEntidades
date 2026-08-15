@@ -25,6 +25,11 @@ public class NecesidadController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.fachada.registrarNecesidad(need));
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    public ResponseEntity<NecesidadMaterialDTO> getNeedById(@PathVariable String id) {
+        return ResponseEntity.ok(this.fachada.buscarNecesidadPorId(id));
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<NecesidadMaterialDTO>> getAllNeedsByProduct(@RequestParam String productoID) {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.obtenerNecesidadesInsatisfechasDe(productoID));

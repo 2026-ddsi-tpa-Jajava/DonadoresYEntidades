@@ -13,6 +13,8 @@ public class DonacionesApiClient {
     private final RestClientBuilder restClientBuilder = new RestClientBuilder(BASE_URL);
 
     public boolean esProductoValido(String productoID) {
+        if (BASE_URL == null || BASE_URL.isBlank()) return true;
+
         String url = BASE_URL + "/productos/" + productoID + "/existencia";
         return restClientBuilder.get(url, Boolean.class);
     }
