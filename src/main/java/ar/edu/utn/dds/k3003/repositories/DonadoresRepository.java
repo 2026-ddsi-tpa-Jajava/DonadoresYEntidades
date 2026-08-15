@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DonadoresRepository {
-  Optional<Donador> findById(String id);
+  Optional<Donador> findById(Long id);
 
   Donador save(Donador donador);
 
   Donador update(Donador donador);
 
-  Donador deleteById(String id);
+  Donador deleteById(Long id);
 
   List<Donador> findAll();
 

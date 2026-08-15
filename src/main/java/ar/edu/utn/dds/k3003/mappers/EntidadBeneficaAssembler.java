@@ -7,7 +7,7 @@ public class EntidadBeneficaAssembler implements Assembler<EntidadBenefica, Enti
   @Override
   public EntidadBenefica toDomain(EntidadBeneficaDTO entidadBeneficaDTO) {
     return new EntidadBenefica(
-        entidadBeneficaDTO.id(),
+        IdUtils.parse(entidadBeneficaDTO.id()),
         entidadBeneficaDTO.razonSocial(),
         entidadBeneficaDTO.domicilio(),
         entidadBeneficaDTO.telefono(),
@@ -17,7 +17,7 @@ public class EntidadBeneficaAssembler implements Assembler<EntidadBenefica, Enti
   @Override
   public EntidadBeneficaDTO toDTO(EntidadBenefica entidadBenefica) {
     return new EntidadBeneficaDTO(
-        entidadBenefica.getId(),
+        IdUtils.stringify(entidadBenefica.getId()),
         entidadBenefica.getRazonSocial(),
         entidadBenefica.getDomicilio(),
         entidadBenefica.getTelefono(),

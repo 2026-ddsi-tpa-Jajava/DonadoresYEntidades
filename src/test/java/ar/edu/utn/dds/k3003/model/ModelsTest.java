@@ -20,7 +20,7 @@ public class ModelsTest {
   @SneakyThrows
   void setUp() {
     donador= new Donador(
-            "donor-id",
+            1L,
             "John",
             "Doe",
             30,
@@ -31,7 +31,7 @@ public class ModelsTest {
             "Ocasional");
 
     entidad = new EntidadBenefica(
-            "charity-id",
+            2L,
             "Fake Charity S.A.",
             "456 Fake Avenue",
             "+5491112345678",
@@ -45,7 +45,7 @@ public class ModelsTest {
             "complaint description");
 
     necesidad = new NecesidadExtraordinaria(
-            "need-id",
+            3L,
             entidad.getId(),
             1,
             "need description",
@@ -113,9 +113,9 @@ public class ModelsTest {
     Assertions.assertEquals(9, necesidad.getNivelDeUrgencia());
 
     Assertions.assertThrows(
-            IllegalArgumentException.class, () -> new NecesidadExtraordinaria("need-id", "charity-id", 0, "need description", 5, "product-id"));
+            IllegalArgumentException.class, () -> new NecesidadExtraordinaria(3L, 2L, 0, "need description", 5, "product-id"));
     Assertions.assertThrows(
-            IllegalArgumentException.class, () -> new NecesidadExtraordinaria("need-id", "charity-id", 11, "need description", 5, "product-id"));
+            IllegalArgumentException.class, () -> new NecesidadExtraordinaria(3L, 2L, 11, "need description", 5, "product-id"));
   }
 
   @Test
@@ -140,10 +140,7 @@ public class ModelsTest {
   }
 
   @Test
-  void testQueja_esDeDonadorIsCaseInsensitive() {
-    donador.setId("DONOR-ID");
-
-    Assertions.assertEquals("DONOR-ID", donador.getId());
+  void testQueja_esDeDonador() {
     Assertions.assertTrue(queja.esDeDonador(donador));
   }
 }

@@ -74,7 +74,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     @Override
     public DonadorDTO agregarDonador(DonadorDTO donadorDTO) {
         log.info("🧑 Agregando donador...");
-        log.debug("🧑 Request agregarDonador: {}", donadorDTO);
+        log.info("🧑 Request agregarDonador: {}", donadorDTO);
 
         if (donadorDTO == null) {
             log.error("🧑 No se pudo agregar el donador: el donador no puede ser nulo");
@@ -86,7 +86,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         DonadorDTO resultado = this.donadorAssembler.toDTO(donador);
 
         log.info("🧑 Donador {} agregado correctamente", resultado.id());
-        log.debug("🧑 Response agregarDonador: {}", resultado);
+        log.info("🧑 Response agregarDonador: {}", resultado);
         return resultado;
     }
 
@@ -98,7 +98,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
                 .toList();
 
         log.info("🧑 Se obtuvieron {} donadores", resultado.size());
-        log.debug("🧑 Response obtenerDonadores: {}", resultado);
+        log.info("🧑 Response obtenerDonadores: {}", resultado);
         return resultado;
     }
 
@@ -115,14 +115,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         DonadorDTO resultado = this.donadorAssembler.toDTO(this.obtenerDonador(donadorID));
 
         log.info("🧑 Donador {} encontrado", donadorID);
-        log.debug("🧑 Response buscarDonadorPorID: {}", resultado);
+        log.info("🧑 Response buscarDonadorPorID: {}", resultado);
         return resultado;
     }
 
     @Override
     public DonadorDTO modificarEstado(String donadorID, EstadoDonadorEnum estado) {
         log.info("🧑 Modificando estado del donador {}...", donadorID);
-        log.debug("🧑 Request modificarEstado: donadorID={}, estado={}", donadorID, estado);
+        log.info("🧑 Request modificarEstado: donadorID={}, estado={}", donadorID, estado);
 
         if (estado == null) {
             log.error("🧑 No se pudo modificar el estado del donador {}: el estado no puede ser nulo", donadorID);
@@ -135,14 +135,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         DonadorDTO resultado = this.donadorAssembler.toDTO(this.donadoresRepository.update(donador));
 
         log.info("🧑 Estado del donador {} modificado a {}", donadorID, estado);
-        log.debug("🧑 Response modificarEstado: {}", resultado);
+        log.info("🧑 Response modificarEstado: {}", resultado);
         return resultado;
     }
 
     @Override
     public DonadorDTO modificarCategoria(String donadorID, String categoria) {
         log.info("🧑 Modificando categoría del donador {}...", donadorID);
-        log.debug("🧑 Request modificarCategoria: donadorID={}, categoria={}", donadorID, categoria);
+        log.info("🧑 Request modificarCategoria: donadorID={}, categoria={}", donadorID, categoria);
 
         if (categoria == null) {
             log.error("🧑 No se pudo modificar la categoría del donador {}: la categoría no puede ser nula", donadorID);
@@ -155,7 +155,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         DonadorDTO resultado = this.donadorAssembler.toDTO(this.donadoresRepository.update(donador));
 
         log.info("🧑 Categoría del donador {} modificada a {}", donadorID, categoria);
-        log.debug("🧑 Response modificarCategoria: {}", resultado);
+        log.info("🧑 Response modificarCategoria: {}", resultado);
         return resultado;
     }
 
@@ -175,7 +175,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         log.info("🧑 Resultado puedeDonar para el donador {}: {}", donadorID, resultado);
-        log.debug("🧑 Response puedeDonar: {}", resultado);
+        log.info("🧑 Response puedeDonar: {}", resultado);
         return resultado;
     }
 
@@ -198,7 +198,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         log.info("📦 Se obtuvieron {} necesidades insatisfechas del producto {}", resultado.size(), productoSolicitado);
-        log.debug("📦 Response obtenerNecesidadesInsatisfechasDe: {}", resultado);
+        log.info("📦 Response obtenerNecesidadesInsatisfechasDe: {}", resultado);
         return resultado;
     }
 
@@ -217,18 +217,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         log.info("📢 Se obtuvieron {} quejas del donador {}", resultado.size(), donadorID);
-        log.debug("📢 Response obtenerQuejasDe: {}", resultado);
+        log.info("📢 Response obtenerQuejasDe: {}", resultado);
         return resultado;
     }
 
     @Override
     public NecesidadMaterialDTO satisfacerNecesidad(String necesidadID, Integer cantidad) {
         log.info("📦 Satisfaciendo necesidad {}...", necesidadID);
-        log.debug("📦 Request satisfacerNecesidad: necesidadID={}, cantidad={}", necesidadID, cantidad);
+        log.info("📦 Request satisfacerNecesidad: necesidadID={}, cantidad={}", necesidadID, cantidad);
 
         NecesidadMaterial necesidad =
                 this.necesidadesRepository
-                        .findById(necesidadID)
+                        .findById(IdUtils.parse(necesidadID))
                         .orElseThrow(
                                 () -> {
                                     log.error("📦 No se pudo satisfacer la necesidad {}: no existe una necesidad con ese ID", necesidadID);
@@ -240,7 +240,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(this.necesidadesRepository.update(necesidad));
 
         log.info("📦 Necesidad {} satisfecha con cantidad {}", necesidadID, cantidad);
-        log.debug("📦 Response satisfacerNecesidad: {}", resultado);
+        log.info("📦 Response satisfacerNecesidad: {}", resultado);
         return resultado;
     }
 
@@ -250,15 +250,15 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         Donador donador = this.obtenerDonador(donadorID);
 
-        log.debug("🧑 Solicitando insignias del donador {} a incentivosApiClient", donadorID);
+        log.info("🧑 Solicitando insignias del donador {} a incentivosApiClient", donadorID);
         List<Insignia> insignias = this.incentivosApiClient.obtenerInsigniasDeDonador(donadorID).stream()
                 .map(this.insigniaMapper::map)
                 .toList();
-        log.debug("🧑 Insignias recibidas del donador {}: {}", donadorID, insignias);
+        log.info("🧑 Insignias recibidas del donador {}: {}", donadorID, insignias);
 
-        log.debug("🧑 Solicitando misión actual del donador {} a incentivosApiClient", donadorID);
+        log.info("🧑 Solicitando misión actual del donador {} a incentivosApiClient", donadorID);
         MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionActualDeDonador(donadorID);
-        log.debug("🧑 Misión recibida del donador {}: {}", donadorID, misionDTO);
+        log.info("🧑 Misión recibida del donador {}: {}", donadorID, misionDTO);
 
         if (misionDTO == null) {
             log.warn("🧑 El donador {} no tiene una misión actual asignada", donadorID);
@@ -270,14 +270,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         DonadorStatsDTO resultado = this.donadorStatsDTOMapper.map(donadorStats);
 
         log.info("🧑 Estadísticas del donador {} obtenidas correctamente", donadorID);
-        log.debug("🧑 Response estadisticasDonador: {}", resultado);
+        log.info("🧑 Response estadisticasDonador: {}", resultado);
         return resultado;
     }
 
     @Override
     public EntidadBeneficaDTO agregarEntidad(EntidadBeneficaDTO entidadBeneficaDTO) {
         log.info("🏭 Agregando entidad benéfica...");
-        log.debug("🏭 Request agregarEntidad: {}", entidadBeneficaDTO);
+        log.info("🏭 Request agregarEntidad: {}", entidadBeneficaDTO);
 
         if (entidadBeneficaDTO == null) {
             log.error("🏭 No se pudo agregar la entidad benéfica: la entidad benéfica no puede ser nula");
@@ -290,7 +290,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         EntidadBeneficaDTO resultado = this.entidadAssembler.toDTO(entidadBeneficaGuardada);
 
         log.info("🏭 Entidad benéfica {} agregada correctamente", resultado.id());
-        log.debug("🏭 Response agregarEntidad: {}", resultado);
+        log.info("🏭 Response agregarEntidad: {}", resultado);
         return resultado;
     }
 
@@ -302,7 +302,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
                 .toList();
 
         log.info("🏭 Se obtuvieron {} entidades benéficas", resultado.size());
-        log.debug("🏭 Response obtenerEntidades: {}", resultado);
+        log.info("🏭 Response obtenerEntidades: {}", resultado);
         return resultado;
     }
 
@@ -319,14 +319,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         EntidadBeneficaDTO resultado = this.entidadAssembler.toDTO(this.obtenerEntidadBenefica(entidadID));
 
         log.info("🏭 Entidad benéfica {} encontrada", entidadID);
-        log.debug("🏭 Response buscarEntidadPorID: {}", resultado);
+        log.info("🏭 Response buscarEntidadPorID: {}", resultado);
         return resultado;
     }
 
     public EntidadBeneficaDTO modificarEntidad(
             String entidadID, String razonSocial, String domicilio, String telefono, String correo) {
         log.info("🏭 Modificando entidad benéfica {}...", entidadID);
-        log.debug(
+        log.info(
                 "🏭 Request modificarEntidad: entidadID={}, razonSocial={}, domicilio={}, telefono={}, correo={}",
                 entidadID, razonSocial, domicilio, telefono, correo);
 
@@ -339,14 +339,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         EntidadBeneficaDTO resultado = this.entidadAssembler.toDTO(this.entidadesRepository.update(entidad));
 
         log.info("🏭 Entidad benéfica {} modificada correctamente", entidadID);
-        log.debug("🏭 Response modificarEntidad: {}", resultado);
+        log.info("🏭 Response modificarEntidad: {}", resultado);
         return resultado;
     }
 
     @Override
     public NecesidadMaterialDTO registrarNecesidad(NecesidadMaterialDTO necesidadMaterialDTO) {
         log.info("📦 Registrando necesidad...");
-        log.debug("📦 Request registrarNecesidad: {}", necesidadMaterialDTO);
+        log.info("📦 Request registrarNecesidad: {}", necesidadMaterialDTO);
 
         if (necesidadMaterialDTO == null) {
             log.error("📦 No se pudo registrar la necesidad: la necesidad no puede ser nula");
@@ -355,10 +355,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         String productoID = necesidadMaterialDTO.productoSolicitadoID();
 
-        log.debug("📦 Consultando validez del producto {} a donacionesApiClient", productoID);
+        log.info("📦 Consultando validez del producto {} a donacionesApiClient", productoID);
         boolean esProductoValido = this.donacionesApiClient
                 .esProductoValido(productoID);
-        log.debug("📦 Producto {} válido: {}", productoID, esProductoValido);
+        log.info("📦 Producto {} válido: {}", productoID, esProductoValido);
 
         if (!esProductoValido) {
             log.error("📦 No se pudo registrar la necesidad: el producto {} no es válido", productoID);
@@ -367,40 +367,40 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         NecesidadMaterial necesidad = this.necesidadAssembler.toDomain(necesidadMaterialDTO);
 
-        log.debug("📦 Consultando stock disponible del producto {} a logisticaApiClient", productoID);
+        log.info("📦 Consultando stock disponible del producto {} a logisticaApiClient", productoID);
         int cantidadEnStock = this.logisticaApiClient.cuantoStockHayDe(productoID);
-        log.debug("📦 Stock disponible del producto {}: {}", productoID, cantidadEnStock);
+        log.info("📦 Stock disponible del producto {}: {}", productoID, cantidadEnStock);
 
         if (cantidadEnStock == 0) {
             log.warn("📦 No hay stock disponible del producto {}, no se generará asignación al registrar la necesidad", productoID);
         }
 
-        if (necesidad instanceof NecesidadRecurrente && cantidadEnStock >= necesidad.getCantidadObjetivo()) {
-            log.debug(
-                    "📦 Creando asignación de stock para necesidad recurrente: necesidadID={}, productoID={}, cantidad={}",
-                    necesidad.getId(), productoID, necesidad.getCantidadObjetivo());
-            this.logisticaApiClient.crearAsignacionStock(necesidad.getId(), necesidad.getProductoSolicitadoID(), necesidad.getCantidadObjetivo());
-        } else if (necesidad instanceof NecesidadExtraordinaria && cantidadEnStock > 0) {
-            int cantidadAAsignar = Math.min(cantidadEnStock, necesidad.getCantidadObjetivo());
-            log.debug(
-                    "📦 Creando asignación de stock para necesidad extraordinaria: necesidadID={}, productoID={}, cantidad={}",
-                    necesidad.getId(), productoID, cantidadAAsignar);
-            this.logisticaApiClient.crearAsignacionStock(necesidad.getId(), necesidad.getProductoSolicitadoID(), cantidadAAsignar);
-        }
-
         NecesidadMaterial necesidadGuardada = this.necesidadesRepository.save(necesidad);
         Metrics.counter("necesidades.registradas").increment();
+        if (necesidad instanceof NecesidadRecurrente && cantidadEnStock >= necesidad.getCantidadObjetivo()) {
+            log.info(
+                    "📦 Creando asignación de stock para necesidad recurrente: necesidadID={}, productoID={}, cantidad={}",
+                    necesidad.getId(), productoID, necesidad.getCantidadObjetivo());
+            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidad.getId()), necesidad.getProductoSolicitadoID(), necesidad.getCantidadObjetivo());
+        } else if (necesidad instanceof NecesidadExtraordinaria && cantidadEnStock > 0) {
+            int cantidadAAsignar = Math.min(cantidadEnStock, necesidad.getCantidadObjetivo());
+            log.info(
+                    "📦 Creando asignación de stock para necesidad extraordinaria: necesidadID={}, productoID={}, cantidad={}",
+                    necesidad.getId(), productoID, cantidadAAsignar);
+            this.logisticaApiClient.crearAsignacionStock(IdUtils.stringify(necesidad.getId()), necesidad.getProductoSolicitadoID(), cantidadAAsignar);
+        }
+
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(necesidadGuardada);
 
         log.info("📦 Necesidad {} registrada correctamente", resultado.id());
-        log.debug("📦 Response registrarNecesidad: {}", resultado);
+        log.info("📦 Response registrarNecesidad: {}", resultado);
         return resultado;
     }
 
     public NecesidadMaterialDTO buscarNecesidadPorId(String id) {
         log.info("📦 Buscando necesidad {}...", id);
 
-        NecesidadMaterial necesidadMaterial = this.necesidadesRepository.findById(id)
+        NecesidadMaterial necesidadMaterial = this.necesidadesRepository.findById(IdUtils.parse(id))
                 .orElseThrow(() -> {
                     log.error("📦 No se pudo buscar la necesidad {}: no existe una necesidad con ese ID", id);
                     return new NecesidadNoEncontradaException("No existe una necesidad con ese ID");
@@ -408,7 +408,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(necesidadMaterial);
 
         log.info("📦 Necesidad {} encontrada", id);
-        log.debug("📦 Response buscarNecesidadPorId: {}", resultado);
+        log.info("📦 Response buscarNecesidadPorId: {}", resultado);
         return resultado;
     }
 
@@ -419,13 +419,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
             Integer cantidadObjetivo,
             String productoSolicitadoID) {
         log.info("📦 Modificando necesidad {}...", necesidadID);
-        log.debug(
+        log.info(
                 "📦 Request modificarNecesidad: necesidadID={}, nivelDeUrgencia={}, descripcion={}, cantidadObjetivo={}, productoSolicitadoID={}",
                 necesidadID, nivelDeUrgencia, descripcion, cantidadObjetivo, productoSolicitadoID);
 
         NecesidadMaterial necesidad =
                 this.necesidadesRepository
-                        .findById(necesidadID)
+                        .findById(IdUtils.parse(necesidadID))
                         .orElseThrow(
                                 () -> {
                                     log.error("📦 No se pudo modificar la necesidad {}: no existe una necesidad con ese ID", necesidadID);
@@ -433,9 +433,9 @@ public class Fachada implements FachadaDonadoresYEntidades {
                                 });
 
         if (productoSolicitadoID != null) {
-            log.debug("📦 Consultando validez del producto {} a donacionesApiClient", productoSolicitadoID);
+            log.info("📦 Consultando validez del producto {} a donacionesApiClient", productoSolicitadoID);
             boolean esProductoValido = this.donacionesApiClient.esProductoValido(productoSolicitadoID);
-            log.debug("📦 Producto {} válido: {}", productoSolicitadoID, esProductoValido);
+            log.info("📦 Producto {} válido: {}", productoSolicitadoID, esProductoValido);
 
             if (!esProductoValido) {
                 log.error("📦 No se pudo modificar la necesidad {}: el producto {} no es válido", necesidadID, productoSolicitadoID);
@@ -450,19 +450,19 @@ public class Fachada implements FachadaDonadoresYEntidades {
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(this.necesidadesRepository.update(necesidad));
 
         log.info("📦 Necesidad {} modificada correctamente", necesidadID);
-        log.debug("📦 Response modificarNecesidad: {}", resultado);
+        log.info("📦 Response modificarNecesidad: {}", resultado);
         return resultado;
     }
 
     public NecesidadMaterialDTO eliminarNecesidad(String id) {
         log.info("📦 Eliminando necesidad {}...", id);
 
-        NecesidadMaterial necesidad = this.necesidadesRepository.deleteById(id);
+        NecesidadMaterial necesidad = this.necesidadesRepository.deleteById(IdUtils.parse(id));
         Metrics.counter("necesidades.eliminadas").increment();
         NecesidadMaterialDTO resultado = this.necesidadAssembler.toDTO(necesidad);
 
         log.info("📦 Necesidad {} eliminada correctamente", id);
-        log.debug("📦 Response eliminarNecesidad: {}", resultado);
+        log.info("📦 Response eliminarNecesidad: {}", resultado);
         return resultado;
     }
 
@@ -475,7 +475,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
     @Override
     public QuejaDTO agregarQueja(QuejaDTO quejaDTO) {
         log.info("📢 Agregando queja...");
-        log.debug("📢 Request agregarQueja: {}", quejaDTO);
+        log.info("📢 Request agregarQueja: {}", quejaDTO);
 
         if (quejaDTO == null) {
             log.error("📢 No se pudo agregar la queja: la queja no puede ser nula");
@@ -483,14 +483,14 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         Queja queja = this.quejasRepository.save(this.quejaAssembler.toDomain(quejaDTO));
-        Donador donador = this.obtenerDonador(queja.getDonadorID());
+        Donador donador = this.obtenerDonador(IdUtils.stringify(queja.getDonadorID()));
         donador.agregarQueja();
         this.donadoresRepository.update(donador);
         Metrics.counter("quejas.registradas").increment();
         QuejaDTO resultado = this.quejaAssembler.toDTO(queja);
 
         log.info("📢 Queja {} agregada correctamente para el donador {}", resultado.id(), queja.getDonadorID());
-        log.debug("📢 Response agregarQueja: {}", resultado);
+        log.info("📢 Response agregarQueja: {}", resultado);
         return resultado;
     }
 
@@ -509,13 +509,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         Donador donador = this.donadoresRepository
-                .findById(donadorID)
+                .findById(IdUtils.parse(donadorID))
                 .orElseThrow(() -> {
                     log.error("🧑 No se pudo obtener el donador {}: no existe un donador con ese ID", donadorID);
                     return new DonadorNoEncontradoException("No existe un donador con ese ID");
                 });
 
-        log.debug("🧑 Donador {} obtenido: {}", donadorID, donador);
+        log.info("🧑 Donador {} obtenido: {}", donadorID, donador);
         return donador;
     }
 
@@ -528,13 +528,13 @@ public class Fachada implements FachadaDonadoresYEntidades {
         }
 
         EntidadBenefica entidad = this.entidadesRepository
-                .findById(entidadID)
+                .findById(IdUtils.parse(entidadID))
                 .orElseThrow(() -> {
                     log.error("🏭 No se pudo obtener la entidad benéfica {}: no existe una entidad benéfica con ese ID", entidadID);
                     return new EntidadNoEncontradaException("No existe una entidad benéfica con ese ID");
                 });
 
-        log.debug("🏭 Entidad benéfica {} obtenida: {}", entidadID, entidad);
+        log.info("🏭 Entidad benéfica {} obtenida: {}", entidadID, entidad);
         return entidad;
     }
 }

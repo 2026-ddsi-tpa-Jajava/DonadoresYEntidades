@@ -7,7 +7,7 @@ public class NuevoDonadorMapper implements Mapper<DonadorDTO, Donador> {
   @Override
   public Donador map(DonadorDTO donador) {
     return new Donador(
-        donador.id(),
+        IdUtils.parse(donador.id()),
         donador.nombre(),
         donador.apellido(),
         donador.edad(),

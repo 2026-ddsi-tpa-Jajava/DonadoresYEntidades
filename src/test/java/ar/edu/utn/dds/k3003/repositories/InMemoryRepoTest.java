@@ -41,7 +41,6 @@ public class InMemoryRepoTest {
   void inMemoryRepo_saveGeneratesIdAndFindsById() {
     Donador donadorGuardado = repo.save(donador);
     Assertions.assertNotNull(donadorGuardado.getId());
-    Assertions.assertTrue(donadorGuardado.getId().startsWith("donador"));
 
     var donadorEncontrado = repo.findById(donadorGuardado.getId());
     Assertions.assertTrue(donadorEncontrado.isPresent());
@@ -49,9 +48,8 @@ public class InMemoryRepoTest {
   }
 
   @Test
-  void inMemoryRepo_findByIdThrowsExceptionWhenIdIsBlankOrNull() {
+  void inMemoryRepo_findByIdThrowsExceptionWhenIdIsNull() {
     Assertions.assertThrows(IllegalArgumentException.class, () -> repo.findById(null));
-    Assertions.assertThrows(IllegalArgumentException.class, () -> repo.findById(""));
   }
 
   @Test
@@ -59,15 +57,14 @@ public class InMemoryRepoTest {
     Assertions.assertThrows(IllegalArgumentException.class, () -> repo.update(null));
     Assertions.assertThrows(IllegalArgumentException.class, () -> repo.update(donador));
 
-    donador.setId("donador999");
+    donador.setId(999L);
     Assertions.assertThrows(NoSuchElementException.class, () -> repo.update(donador));
   }
 
   @Test
-  void inMemoryRepo_deleteByIdThrowsExceptionWhenObjectIdIsBlankOrNullOrNotInRepo() {
+  void inMemoryRepo_deleteByIdThrowsExceptionWhenObjectIdIsNullOrNotInRepo() {
     Assertions.assertThrows(IllegalArgumentException.class, () -> repo.deleteById(null));
-    Assertions.assertThrows(IllegalArgumentException.class, () -> repo.deleteById(""));
-    Assertions.assertThrows(NoSuchElementException.class, () -> repo.deleteById("non-existing"));
+    Assertions.assertThrows(NoSuchElementException.class, () -> repo.deleteById(999999L));
   }
 
   @Test

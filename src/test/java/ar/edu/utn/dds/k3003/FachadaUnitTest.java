@@ -67,7 +67,7 @@ public class FachadaUnitTest {
 
     NecesidadMaterialDTO necesidadMaterialDTO = new NecesidadMaterialDTO(
             null,
-            "charity-id",
+            "1",
             8,
             "need description",
             100,
@@ -82,7 +82,7 @@ public class FachadaUnitTest {
     Field f = Fachada.class.getDeclaredField("necesidadesRepository");
     f.setAccessible(true);
     NecesidadesRepository repo = (NecesidadesRepository) f.get(fachada);
-    NecesidadMaterial necesidadMaterial = repo.findById(necesidadSatisfechaDTO.id())
+    NecesidadMaterial necesidadMaterial = repo.findById(Long.valueOf(necesidadSatisfechaDTO.id()))
             .orElseThrow(() -> new NecesidadNoEncontradaException("No existe una necesidad con ese ID"));
 
     Assertions.assertEquals(necesidadGuardadaDTO.id(), necesidadSatisfechaDTO.id());

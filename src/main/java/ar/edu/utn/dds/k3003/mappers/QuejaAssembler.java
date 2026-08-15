@@ -8,9 +8,9 @@ public class QuejaAssembler implements Assembler<Queja, QuejaDTO> {
   public Queja toDomain(QuejaDTO quejaDTO) {
 
     return new Queja(
-        quejaDTO.id(),
+        IdUtils.parse(quejaDTO.id()),
         quejaDTO.donacionID(),
-        quejaDTO.donadorID(),
+        IdUtils.parse(quejaDTO.donadorID()),
         quejaDTO.fecha() != null ? quejaDTO.fecha().atStartOfDay() : null,
         quejaDTO.descripcion());
   }
@@ -18,9 +18,9 @@ public class QuejaAssembler implements Assembler<Queja, QuejaDTO> {
   @Override
   public QuejaDTO toDTO(Queja queja) {
     return new QuejaDTO(
-        queja.getId(),
+        IdUtils.stringify(queja.getId()),
         queja.getDonacionID(),
-        queja.getDonadorID(),
+        IdUtils.stringify(queja.getDonadorID()),
         queja.getFecha() != null ? queja.getFecha().toLocalDate() : null,
         queja.getDescripcion());
   }

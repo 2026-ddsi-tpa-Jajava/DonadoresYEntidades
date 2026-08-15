@@ -11,17 +11,18 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "Queja")
-public class Queja extends Persistable {
+public class Queja extends PersistableEntity {
   @Column(name = "donacion_id")
   private String donacionID;
 
   @Column(name = "donador_id")
-  private String donadorID;
+  private Long donadorID;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "donador_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -38,12 +39,12 @@ public class Queja extends Persistable {
   }
 
   public Queja(
-      String id, String donacionID, String donadorID, LocalDate fecha, String descripcion) {
+      Long id, String donacionID, Long donadorID, LocalDate fecha, String descripcion) {
     this(id, donacionID, donadorID, fecha != null ? fecha.atStartOfDay() : null, descripcion);
   }
 
   public Queja(
-      String id, String donacionID, String donadorID, LocalDateTime fecha, String descripcion) {
+      Long id, String donacionID, Long donadorID, LocalDateTime fecha, String descripcion) {
     super(id);
     this.donacionID = donacionID;
     this.donadorID = donadorID;
@@ -52,6 +53,6 @@ public class Queja extends Persistable {
   }
 
   public boolean esDeDonador(Donador donador) {
-    return this.getDonadorID().equalsIgnoreCase(donador.getId());
+    return Objects.equals(this.getDonadorID(), donador.getId());
   }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "EntidadBenefica")
-public class EntidadBenefica extends Persistable {
+public class EntidadBenefica extends PersistableEntity {
   @Column(name = "razon_social")
   private String razonSocial;
 
@@ -36,7 +36,7 @@ public class EntidadBenefica extends Persistable {
   }
 
   public EntidadBenefica(
-      String id, String razonSocial, String domicilio, String telefono, String correo) {
+      Long id, String razonSocial, String domicilio, String telefono, String correo) {
     super(id);
     this.razonSocial = razonSocial;
     this.domicilio = domicilio;

@@ -15,7 +15,7 @@ import java.util.Random;
 @Getter
 @Entity
 @Table(name = "Donador")
-public class Donador extends Persistable {
+public class Donador extends PersistableEntity {
   @Column(name = "nombre")
   private String nombre;
 
@@ -68,7 +68,7 @@ public class Donador extends Persistable {
   }
 
   public Donador(
-      String id,
+      Long id,
       String nombre,
       String apellido,
       Integer edad,
@@ -89,7 +89,7 @@ public class Donador extends Persistable {
   }
 
   public Donador(
-      String id,
+      Long id,
       String nombre,
       String apellido,
       Integer edad,

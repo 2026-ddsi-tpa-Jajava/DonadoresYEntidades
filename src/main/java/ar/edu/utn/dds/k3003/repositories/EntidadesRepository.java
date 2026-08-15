@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EntidadesRepository {
-  Optional<EntidadBenefica> findById(String id);
+  Optional<EntidadBenefica> findById(Long id);
 
   EntidadBenefica save(EntidadBenefica entidadBenefica);
 
   EntidadBenefica update(EntidadBenefica entidadBenefica);
 
-  EntidadBenefica deleteById(String id);
+  EntidadBenefica deleteById(Long id);
 
   List<EntidadBenefica> findAll();
 

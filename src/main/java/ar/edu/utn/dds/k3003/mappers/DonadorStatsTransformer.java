@@ -11,7 +11,7 @@ public class DonadorStatsTransformer {
   public DonadorStats crearDonadorStatsCon(
       Donador donador, Mision mision, List<Insignia> insignias) {
     return new DonadorStats(
-        donador.getId(),
+        IdUtils.stringify(donador.getId()),
         donador.getNombre(),
         donador.getApellido(),
         donador.getEdad(),

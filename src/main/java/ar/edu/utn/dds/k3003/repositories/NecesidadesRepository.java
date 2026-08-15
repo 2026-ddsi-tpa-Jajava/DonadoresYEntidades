@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NecesidadesRepository {
-  Optional<NecesidadMaterial> findById(String id);
+  Optional<NecesidadMaterial> findById(Long id);
 
   NecesidadMaterial save(NecesidadMaterial necesidad);
 
   NecesidadMaterial update(NecesidadMaterial necesidad);
 
-  NecesidadMaterial deleteById(String id);
+  NecesidadMaterial deleteById(Long id);
 
   List<NecesidadMaterial> findAll();
 

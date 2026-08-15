@@ -10,8 +10,8 @@ public class NecesidadRecurrente extends NecesidadMaterial {
         // Constructor vacío requerido por JPA
     }
 
-    public NecesidadRecurrente(String id,
-                               String entidadID,
+    public NecesidadRecurrente(Long id,
+                               Long entidadID,
                                Integer nivelDeUrgencia,
                                String descripcion,
                                Integer cantidadObjetivo,

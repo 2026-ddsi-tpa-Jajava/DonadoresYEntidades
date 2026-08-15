@@ -22,9 +22,9 @@ import java.util.Objects;
 @Table(name = "Necesidad")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING)
-public abstract class NecesidadMaterial extends Persistable {
+public abstract class NecesidadMaterial extends PersistableEntity {
   @Column(name = "entidad_id")
-  private String entidadID;
+  private Long entidadID;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "entidad_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -55,8 +55,8 @@ public abstract class NecesidadMaterial extends Persistable {
   }
 
   public NecesidadMaterial(
-      String id,
-      String entidadID,
+      Long id,
+      Long entidadID,
       Integer nivelDeUrgencia,
       String descripcion,
       Integer cantidadObjetivo,

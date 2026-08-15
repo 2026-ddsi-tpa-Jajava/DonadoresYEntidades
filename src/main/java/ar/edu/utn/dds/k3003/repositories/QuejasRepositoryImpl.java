@@ -1,6 +1,5 @@
 package ar.edu.utn.dds.k3003.repositories;
 
-import ar.edu.utn.dds.k3003.model.Donador;
 import ar.edu.utn.dds.k3003.model.Queja;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,13 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class QuejasRepositoryImpl implements QuejasRepository {
 
   private final QuejasJpaRepository jpaRepository;
-  private final AtomicLong idSecuencial = new AtomicLong(1);
 
   @Autowired
   public QuejasRepositoryImpl(QuejasJpaRepository jpaRepository) {
@@ -22,7 +19,7 @@ public class QuejasRepositoryImpl implements QuejasRepository {
   }
 
   @Override
-  public Optional<Queja> findById(String id) {
+  public Optional<Queja> findById(Long id) {
     return jpaRepository.findById(id);
   }
 
@@ -32,7 +29,6 @@ public class QuejasRepositoryImpl implements QuejasRepository {
     if (queja.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
 
-    queja.setId(String.valueOf(idSecuencial.getAndIncrement()));
     return jpaRepository.save(queja);
   }
 
@@ -48,8 +44,8 @@ public class QuejasRepositoryImpl implements QuejasRepository {
   }
 
   @Override
-  public Queja deleteById(String id) {
-    if (id == null || id.isBlank()) throw new IllegalArgumentException("El ID no puede ser nulo o vacío");
+  public Queja deleteById(Long id) {
+    if (id == null) throw new IllegalArgumentException("El ID no puede ser nulo");
     Optional<Queja> removed = jpaRepository.findById(id);
     if (removed.isEmpty()) throw new NoSuchElementException("El elemento a eliminar no existe");
 
@@ -65,7 +61,5 @@ public class QuejasRepositoryImpl implements QuejasRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
-    idSecuencial.set(1);
   }
 }
-

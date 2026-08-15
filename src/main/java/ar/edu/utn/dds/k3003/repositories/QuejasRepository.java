@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuejasRepository {
-  Optional<Queja> findById(String id);
+  Optional<Queja> findById(Long id);
 
   Queja save(Queja queja);
 
   Queja update(Queja queja);
 
-  Queja deleteById(String id);
+  Queja deleteById(Long id);
 
   List<Queja> findAll();
 

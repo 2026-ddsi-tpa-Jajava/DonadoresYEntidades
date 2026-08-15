@@ -10,8 +10,8 @@ public class NecesidadExtraordinaria extends NecesidadMaterial {
         // Constructor vacío requerido por JPA
     }
 
-    public NecesidadExtraordinaria(String id,
-                                   String entidadID,
+    public NecesidadExtraordinaria(Long id,
+                                   Long entidadID,
                                    Integer nivelDeUrgencia,
                                    String descripcion,
                                    Integer cantidadObjetivo,

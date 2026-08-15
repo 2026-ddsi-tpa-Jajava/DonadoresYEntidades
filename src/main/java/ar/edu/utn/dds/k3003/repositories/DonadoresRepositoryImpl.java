@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implementación de DonadoresRepository que usa DonadoresJpaRepository para persistencia en base
@@ -16,14 +15,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DonadoresRepositoryImpl implements DonadoresRepository {
 
   private final DonadoresJpaRepository jpaRepository;
-  private final AtomicLong idSecuencial = new AtomicLong(1);
 
   public DonadoresRepositoryImpl(DonadoresJpaRepository jpaRepository) {
     this.jpaRepository = jpaRepository;
   }
 
   @Override
-  public Optional<Donador> findById(String id) {
+  public Optional<Donador> findById(Long id) {
     return jpaRepository.findById(id);
   }
 
@@ -33,7 +31,6 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
     if (donador.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
 
-    donador.setId(String.valueOf(idSecuencial.getAndIncrement()));
     return jpaRepository.save(donador);
   }
 
@@ -49,8 +46,8 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
   }
 
   @Override
-  public Donador deleteById(String id) {
-    if (id == null || id.isBlank()) throw new IllegalArgumentException("El ID no puede ser nulo o vacío");
+  public Donador deleteById(Long id) {
+    if (id == null) throw new IllegalArgumentException("El ID no puede ser nulo");
 
     Optional<Donador> donador = jpaRepository.findById(id);
     if (donador.isEmpty()) throw new NoSuchElementException("El elemento a eliminar no existe");
@@ -67,7 +64,5 @@ public class DonadoresRepositoryImpl implements DonadoresRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
-    idSecuencial.set(1);
   }
 }
-

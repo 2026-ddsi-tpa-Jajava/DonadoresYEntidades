@@ -8,7 +8,7 @@ public class DonadorAssembler implements Assembler<Donador, DonadorDTO> {
   @Override
   public Donador toDomain(DonadorDTO dto) {
     return new Donador(
-        dto.id(),
+        IdUtils.parse(dto.id()),
         dto.nombre(),
         dto.apellido(),
         dto.edad(),
@@ -22,7 +22,7 @@ public class DonadorAssembler implements Assembler<Donador, DonadorDTO> {
   @Override
   public DonadorDTO toDTO(Donador domain) {
     return new DonadorDTO(
-        domain.getId(),
+        IdUtils.stringify(domain.getId()),
         domain.getNombre(),
         domain.getApellido(),
         domain.getEdad(),

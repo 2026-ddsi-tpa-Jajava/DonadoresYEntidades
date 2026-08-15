@@ -14,8 +14,8 @@ public class NecesidadMaterialAssembler
         switch (dto.tipo()) {
             case EXTRAORDINARIA -> {
                 return new NecesidadExtraordinaria(
-                        dto.id(),
-                        dto.entidadID(),
+                        IdUtils.parse(dto.id()),
+                        IdUtils.parse(dto.entidadID()),
                         dto.nivelDeUrgencia(),
                         dto.descripcion(),
                         dto.cantidadObjetivo(),
@@ -23,8 +23,8 @@ public class NecesidadMaterialAssembler
             }
             case RECURRENTE -> {
                 return new NecesidadRecurrente(
-                        dto.id(),
-                        dto.entidadID(),
+                        IdUtils.parse(dto.id()),
+                        IdUtils.parse(dto.entidadID()),
                         dto.nivelDeUrgencia(),
                         dto.descripcion(),
                         dto.cantidadObjetivo(),
@@ -45,8 +45,8 @@ public class NecesidadMaterialAssembler
             throw new IllegalArgumentException("Tipo de necesidad material no reconocido");
         }
         return new NecesidadMaterialDTO(
-                domain.getId(),
-                domain.getEntidadID(),
+                IdUtils.stringify(domain.getId()),
+                IdUtils.stringify(domain.getEntidadID()),
                 domain.getNivelDeUrgencia(),
                 domain.getDescripcion(),
                 domain.getCantidadObjetivo(),

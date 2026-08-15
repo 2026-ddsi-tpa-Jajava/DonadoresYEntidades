@@ -1,19 +1,16 @@
 package ar.edu.utn.dds.k3003.repositories;
 
-import ar.edu.utn.dds.k3003.model.Persistable;
+import ar.edu.utn.dds.k3003.model.PersistableEntity;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class InMemoryRepo<T extends Persistable> {
-  private final Map<String, T> storage = new ConcurrentHashMap<>();
+public abstract class InMemoryRepo<T extends PersistableEntity> {
+  private final Map<Long, T> storage = new ConcurrentHashMap<>();
   private final AtomicLong incrementalId = new AtomicLong(1);
 
-  protected abstract String getObjectName();
-
-  public Optional<T> findById(String id) {
-    if (id == null || id.isBlank())
-      throw new IllegalArgumentException("El ID no puede ser nulo o vacío");
+  public Optional<T> findById(Long id) {
+    if (id == null) throw new IllegalArgumentException("El ID no puede ser nulo");
     return Optional.ofNullable(storage.get(id));
   }
 
@@ -23,7 +20,7 @@ public abstract class InMemoryRepo<T extends Persistable> {
       throw new IllegalArgumentException(
           "El ID no debe ser proporcionado al guardar un nuevo elemento");
 
-    obj.setId(this.getObjectName() + incrementalId.getAndIncrement());
+    obj.setId(incrementalId.getAndIncrement());
     this.storage.put(obj.getId(), obj);
 
     return this.storage.get(obj.getId());
@@ -41,9 +38,8 @@ public abstract class InMemoryRepo<T extends Persistable> {
     return this.storage.get(obj.getId());
   }
 
-  public T deleteById(String id) {
-    if (id == null || id.isBlank())
-      throw new IllegalArgumentException("El ID no puede ser nulo o vacío");
+  public T deleteById(Long id) {
+    if (id == null) throw new IllegalArgumentException("El ID no puede ser nulo");
 
     T removed = this.storage.remove(id);
     if (removed == null) throw new NoSuchElementException("El elemento a eliminar no existe");
@@ -57,5 +53,5 @@ public abstract class InMemoryRepo<T extends Persistable> {
 
   public void deleteAll() {
     this.storage.clear();
-    }
+  }
 }

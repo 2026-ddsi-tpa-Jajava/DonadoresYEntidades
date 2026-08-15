@@ -1,6 +1,5 @@
 package ar.edu.utn.dds.k3003.repositories;
 
-import ar.edu.utn.dds.k3003.model.Donador;
 import ar.edu.utn.dds.k3003.model.EntidadBenefica;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,13 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class EntidadesRepositoryImpl implements EntidadesRepository {
 
   private final EntidadesJpaRepository jpaRepository;
-  private final AtomicLong idSecuencial = new AtomicLong(1);
 
   @Autowired
   public EntidadesRepositoryImpl(EntidadesJpaRepository jpaRepository) {
@@ -22,7 +19,7 @@ public class EntidadesRepositoryImpl implements EntidadesRepository {
   }
 
   @Override
-  public Optional<EntidadBenefica> findById(String id) {
+  public Optional<EntidadBenefica> findById(Long id) {
     return jpaRepository.findById(id);
   }
 
@@ -33,7 +30,6 @@ public class EntidadesRepositoryImpl implements EntidadesRepository {
     if (entidadBenefica.getId() != null)
       throw new IllegalArgumentException("El ID no debe ser proporcionado al guardar un nuevo elemento");
 
-    entidadBenefica.setId(String.valueOf(idSecuencial.getAndIncrement()));
     return jpaRepository.save(entidadBenefica);
   }
 
@@ -50,8 +46,8 @@ public class EntidadesRepositoryImpl implements EntidadesRepository {
   }
 
   @Override
-  public EntidadBenefica deleteById(String id) {
-    if (id == null || id.isBlank()) throw new IllegalArgumentException("El ID no puede ser nulo o vacío");
+  public EntidadBenefica deleteById(Long id) {
+    if (id == null) throw new IllegalArgumentException("El ID no puede ser nulo");
     Optional<EntidadBenefica> removed = jpaRepository.findById(id);
     if (removed.isEmpty()) throw new NoSuchElementException("El elemento a eliminar no existe");
 
@@ -67,7 +63,5 @@ public class EntidadesRepositoryImpl implements EntidadesRepository {
   @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
-    idSecuencial.set(1);
   }
 }
-

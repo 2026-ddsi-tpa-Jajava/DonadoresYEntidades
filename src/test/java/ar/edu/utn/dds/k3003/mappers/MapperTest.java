@@ -27,7 +27,7 @@ public class MapperTest {
   @SneakyThrows
   void setUp() {
     donadorDTO = new DonadorDTO(
-            "donor-id",
+            "1",
             "John",
             "Doe",
             30,
@@ -38,14 +38,14 @@ public class MapperTest {
             "category test");
 
     entidadBeneficaDTO = new EntidadBeneficaDTO(
-            "charity-id",
+            "2",
             "Fake Charity S.A.",
             "456 Fake Avenue",
             "+5491112345678",
             "fakecharity@example.com");
 
     necesidadMaterialDTO = new NecesidadMaterialDTO(
-            "need-id",
+            "3",
             entidadBeneficaDTO.id(),
             5,
             "fake need",
@@ -54,7 +54,7 @@ public class MapperTest {
             TipoNecesidadMaterialEnum.EXTRAORDINARIA);
 
     quejaDTO = new QuejaDTO(
-            "complaint-id",
+            "4",
             "donation-id",
             donadorDTO.id(),
             LocalDate.now(),
