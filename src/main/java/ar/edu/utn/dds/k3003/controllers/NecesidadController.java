@@ -40,6 +40,32 @@ public class NecesidadController {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.satisfacerNecesidad(id, quantity));
     }
 
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    public ResponseEntity<NecesidadMaterialDTO> editNeed(@PathVariable String id, @RequestBody Map<String, String> request) {
+        List<String> camposPermitidos = List.of("nivelDeUrgencia", "descripcion", "cantidadObjetivo", "productoSolicitadoID");
+
+        if (request.isEmpty())
+            throw new IllegalArgumentException("Debe indicarse al menos uno de los campos: 'nivelDeUrgencia', 'descripcion', 'cantidadObjetivo' o 'productoSolicitadoID'");
+        if (!camposPermitidos.containsAll(request.keySet()))
+            throw new IllegalArgumentException("Solo se permiten los campos 'nivelDeUrgencia', 'descripcion', 'cantidadObjetivo' y 'productoSolicitadoID'");
+
+        String nivelDeUrgencia = request.get("nivelDeUrgencia");
+        String cantidadObjetivo = request.get("cantidadObjetivo");
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.fachada.modificarNecesidad(
+                id,
+                nivelDeUrgencia != null ? Integer.valueOf(nivelDeUrgencia) : null,
+                request.get("descripcion"),
+                cantidadObjetivo != null ? Integer.valueOf(cantidadObjetivo) : null,
+                request.get("productoSolicitadoID")));
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public ResponseEntity<NecesidadMaterialDTO> deleteNeed(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.fachada.eliminarNecesidad(id));
+    }
+
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteAllNeeds() {
         this.fachada.eliminarTodasLasNecesidades();

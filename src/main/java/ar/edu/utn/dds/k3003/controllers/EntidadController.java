@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/entidades")
@@ -33,6 +34,23 @@ public class EntidadController {
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<EntidadBeneficaDTO> getEntityById(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.buscarEntidadPorID(id));
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    public ResponseEntity<EntidadBeneficaDTO> editEntity(@PathVariable String id, @RequestBody Map<String, String> request) {
+        List<String> camposPermitidos = List.of("razonSocial", "domicilio", "telefono", "correo");
+
+        if (request.isEmpty())
+            throw new IllegalArgumentException("Debe indicarse al menos uno de los campos: 'razonSocial', 'domicilio', 'telefono' o 'correo'");
+        if (!camposPermitidos.containsAll(request.keySet()))
+            throw new IllegalArgumentException("Solo se permiten los campos 'razonSocial', 'domicilio', 'telefono' y 'correo'");
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.fachada.modificarEntidad(
+                id,
+                request.get("razonSocial"),
+                request.get("domicilio"),
+                request.get("telefono"),
+                request.get("correo")));
     }
 
     @RequestMapping(method = RequestMethod.DELETE)

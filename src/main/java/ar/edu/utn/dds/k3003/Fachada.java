@@ -195,6 +195,17 @@ public class Fachada implements FachadaDonadoresYEntidades {
         return this.entidadAssembler.toDTO(this.obtenerEntidadBenefica(entidadID));
     }
 
+    public EntidadBeneficaDTO modificarEntidad(
+            String entidadID, String razonSocial, String domicilio, String telefono, String correo) {
+        EntidadBenefica entidad = this.obtenerEntidadBenefica(entidadID);
+        if (razonSocial != null) entidad.setRazonSocial(razonSocial);
+        if (domicilio != null) entidad.setDomicilio(domicilio);
+        if (telefono != null) entidad.setTelefono(telefono);
+        if (correo != null) entidad.setCorreo(correo);
+
+        return this.entidadAssembler.toDTO(this.entidadesRepository.update(entidad));
+    }
+
     @Override
     public NecesidadMaterialDTO registrarNecesidad(NecesidadMaterialDTO necesidadMaterialDTO) {
         if (necesidadMaterialDTO == null)
@@ -220,6 +231,36 @@ public class Fachada implements FachadaDonadoresYEntidades {
         NecesidadMaterial necesidadGuardada = this.necesidadesRepository.save(necesidad);
         Metrics.counter("necesidades.registradas").increment();
         return this.necesidadAssembler.toDTO(necesidadGuardada);
+    }
+
+    public NecesidadMaterialDTO modificarNecesidad(
+            String necesidadID,
+            Integer nivelDeUrgencia,
+            String descripcion,
+            Integer cantidadObjetivo,
+            String productoSolicitadoID) {
+        NecesidadMaterial necesidad =
+                this.necesidadesRepository
+                        .findById(necesidadID)
+                        .orElseThrow(
+                                () -> new NecesidadNoEncontradaException("No existe una necesidad con ese ID"));
+
+        if (productoSolicitadoID != null) {
+            if (!this.donacionesApiClient.esProductoValido(productoSolicitadoID))
+                throw new IllegalArgumentException("El producto solicitado no es válido");
+            necesidad.setProductoSolicitadoID(productoSolicitadoID);
+        }
+        if (nivelDeUrgencia != null) necesidad.setNivelDeUrgencia(nivelDeUrgencia);
+        if (descripcion != null) necesidad.setDescripcion(descripcion);
+        if (cantidadObjetivo != null) necesidad.setCantidadObjetivo(cantidadObjetivo);
+
+        return this.necesidadAssembler.toDTO(this.necesidadesRepository.update(necesidad));
+    }
+
+    public NecesidadMaterialDTO eliminarNecesidad(String id) {
+        NecesidadMaterial necesidad = this.necesidadesRepository.deleteById(id);
+        Metrics.counter("necesidades.eliminadas").increment();
+        return this.necesidadAssembler.toDTO(necesidad);
     }
 
     public void eliminarTodasLasNecesidades() {
