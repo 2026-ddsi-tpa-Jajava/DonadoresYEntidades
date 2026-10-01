@@ -17,7 +17,7 @@ public class DonadorStatsTransformer {
         donador.getEdad(),
         donador.getEstado(),
         donador.getCategoria(),
-        mision.getId(),
+        mision == null ? null : mision.getId(),
         this.obtenerInsigniasIds(insignias));
   }
 

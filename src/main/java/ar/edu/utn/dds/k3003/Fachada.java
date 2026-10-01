@@ -270,11 +270,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
         MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionActualDeDonador(donadorID);
         log.info("🧑 Misión recibida del donador {}: {}", donadorID, misionDTO);
 
+        Mision mision = null;
         if (misionDTO == null) {
             log.warn("🧑 El donador {} no tiene una misión actual asignada", donadorID);
+        } else {
+            mision = this.misionMapper.map(misionDTO);
         }
-
-        Mision mision = this.misionMapper.map(misionDTO);
 
         DonadorStats donadorStats = this.donadorStatsTransformer.crearDonadorStatsCon(donador, mision, insignias);
         DonadorStatsDTO resultado = this.donadorStatsDTOMapper.map(donadorStats);
