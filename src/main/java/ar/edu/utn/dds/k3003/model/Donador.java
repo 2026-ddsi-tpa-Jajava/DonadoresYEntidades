@@ -125,18 +125,25 @@ public class Donador extends PersistableEntity {
     this.agregarEstadoAHistorial(estado);
   }
 
+  public static final int UMBRAL_SOSPECHOSO_POR_DEFECTO = 5;
+  public static final int UMBRAL_BANEADO_POR_DEFECTO = 10;
+
   public void agregarQueja() {
-    this.cantidadQuejas += 1;
-    this.validarCantidadQuejas();
+    this.agregarQueja(UMBRAL_SOSPECHOSO_POR_DEFECTO, UMBRAL_BANEADO_POR_DEFECTO);
   }
 
-  private void validarCantidadQuejas() {
-    if (this.cantidadQuejas >= 10) {
+  public void agregarQueja(int umbralSospechoso, int umbralBaneado) {
+    this.cantidadQuejas += 1;
+    this.validarCantidadQuejas(umbralSospechoso, umbralBaneado);
+  }
+
+  private void validarCantidadQuejas(int umbralSospechoso, int umbralBaneado) {
+    if (this.cantidadQuejas >= umbralBaneado) {
       this.setEstado(EstadoDonadorEnum.BANEADO);
       return;
     }
 
-    if (this.cantidadQuejas >= 5) {
+    if (this.cantidadQuejas >= umbralSospechoso) {
       this.setEstado(EstadoDonadorEnum.SOSPECHOSO);
     }
   }

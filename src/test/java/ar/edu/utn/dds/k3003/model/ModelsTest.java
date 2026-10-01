@@ -92,6 +92,16 @@ public class ModelsTest {
   }
 
   @Test
+  void testDonador_agregarQuejaRespetaUmbralesConfigurables() {
+    donador.agregarQueja(2, 3);
+    Assertions.assertEquals(EstadoDonadorEnum.VERIFICADO, donador.getEstado());
+    donador.agregarQueja(2, 3);
+    Assertions.assertEquals(EstadoDonadorEnum.SOSPECHOSO, donador.getEstado());
+    donador.agregarQueja(2, 3);
+    Assertions.assertEquals(EstadoDonadorEnum.BANEADO, donador.getEstado());
+  }
+
+  @Test
   void testDonador_getHistorialEstadosReturnsAllStatus() {
     donador.setEstado(EstadoDonadorEnum.SOSPECHOSO);
     donador.setEstado(EstadoDonadorEnum.VERIFICADO);

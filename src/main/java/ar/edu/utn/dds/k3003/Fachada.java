@@ -17,6 +17,8 @@ import ar.edu.utn.dds.k3003.repositories.*;
 import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +44,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final DonacionesApiClient donacionesApiClient;
     private final LogisticaApiClient logisticaApiClient;
 
+    @Value("${donadores.quejas.umbral-sospechoso:" + Donador.UMBRAL_SOSPECHOSO_POR_DEFECTO + "}")
+    private int umbralQuejasSospechoso = Donador.UMBRAL_SOSPECHOSO_POR_DEFECTO;
+
+    @Value("${donadores.quejas.umbral-baneado:" + Donador.UMBRAL_BANEADO_POR_DEFECTO + "}")
+    private int umbralQuejasBaneado = Donador.UMBRAL_BANEADO_POR_DEFECTO;
+
     @Autowired
     public Fachada(
             DonadoresRepository donadoresRepository,
@@ -58,6 +66,15 @@ public class Fachada implements FachadaDonadoresYEntidades {
         this.incentivosApiClient = incentivosApiClient;
         this.donacionesApiClient = donacionesApiClient;
         this.logisticaApiClient = logisticaApiClient;
+    }
+
+    @PostConstruct
+    void validarUmbralesDeQuejas() {
+        if (umbralQuejasSospechoso < 1 || umbralQuejasBaneado < umbralQuejasSospechoso) {
+            throw new IllegalStateException(
+                    "Configuración inválida: donadores.quejas.umbral-sospechoso debe ser >= 1 y "
+                            + "donadores.quejas.umbral-baneado debe ser >= umbral-sospechoso");
+        }
     }
 
     // Constructor por defecto para uso en tests o ejecución sin Spring
@@ -508,7 +525,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         Queja queja = this.quejasRepository.save(this.quejaAssembler.toDomain(quejaDTO));
         Donador donador = this.obtenerDonador(IdUtils.stringify(queja.getDonadorID()));
-        donador.agregarQueja();
+        donador.agregarQueja(this.umbralQuejasSospechoso, this.umbralQuejasBaneado);
         this.donadoresRepository.update(donador);
         Metrics.counter("quejas.registradas").increment();
         QuejaDTO resultado = this.quejaAssembler.toDTO(queja);
