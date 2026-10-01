@@ -1,6 +1,11 @@
 package ar.edu.utn.dds.k3003;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorStatsDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EstadoDonadorEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.InsigniaDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.TipoMisionEnum;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EntidadBeneficaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
@@ -23,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -93,6 +99,36 @@ public class FachadaUnitTest {
   @Test
   void testFachada_estadisticasDonadorThrowsExceptionWhenFachadaIncentivosIsNotDefined() {
     Assertions.assertThrows(IllegalArgumentException.class, () -> fachada.estadisticasDonador("donor-id"));
+  }
+
+  @Test
+  void testFachada_estadisticasDonadorIncluyeInsigniasYMisionActual() {
+    DonadorDTO donador = fachada.agregarDonador(
+        new DonadorDTO(null, "Ana", "Perez", 30, "a@b.com", "1", "x", EstadoDonadorEnum.VERIFICADO, "x"));
+    when(incentivosApiClient.obtenerInsigniasDeDonador(donador.id()))
+        .thenReturn(List.of(new InsigniaDTO("insignia1", "insignia1", "insignia1")));
+    when(incentivosApiClient.obtenerMisionActualDeDonador(donador.id()))
+        .thenReturn(new MisionDTO("mision1", "mision1", "insignia1", null, null, TipoMisionEnum.DONACIONES_EXITOSAS));
+
+    DonadorStatsDTO stats = fachada.estadisticasDonador(donador.id());
+
+    Assertions.assertEquals(donador.nombre(), stats.nombre());
+    Assertions.assertEquals(1, stats.insigniasID().size());
+    Assertions.assertNotNull(stats.misionActualID());
+  }
+
+  @Test
+  void testFachada_estadisticasDonadorSinMisionActualNoFalla() {
+    DonadorDTO donador = fachada.agregarDonador(
+        new DonadorDTO(null, "Ana", "Perez", 30, "a@b.com", "1", "x", EstadoDonadorEnum.VERIFICADO, "x"));
+    when(incentivosApiClient.obtenerInsigniasDeDonador(donador.id())).thenReturn(List.of());
+    when(incentivosApiClient.obtenerMisionActualDeDonador(donador.id())).thenReturn(null);
+
+    DonadorStatsDTO stats = fachada.estadisticasDonador(donador.id());
+
+    Assertions.assertEquals(donador.nombre(), stats.nombre());
+    Assertions.assertTrue(stats.insigniasID().isEmpty());
+    Assertions.assertNull(stats.misionActualID());
   }
 
   @Test
