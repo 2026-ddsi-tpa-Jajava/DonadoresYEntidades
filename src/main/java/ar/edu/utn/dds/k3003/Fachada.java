@@ -81,6 +81,12 @@ public class Fachada implements FachadaDonadoresYEntidades {
             throw new IllegalArgumentException("El donador no puede ser nulo");
         }
 
+        requireText(donadorDTO.nombre(), "nombre");
+        requireText(donadorDTO.apellido(), "apellido");
+        if (donadorDTO.edad() == null || donadorDTO.edad() <= 0) {
+            throw new IllegalArgumentException("El campo 'edad' es requerido y debe ser mayor a 0");
+        }
+
         Donador donador = this.donadoresRepository.save(this.nuevoDonadorMapper.map(donadorDTO));
         Metrics.counter("donadores.registrados").increment();
         DonadorDTO resultado = this.donadorAssembler.toDTO(donador);
@@ -226,6 +232,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
         log.info("📦 Satisfaciendo necesidad {}...", necesidadID);
         log.info("📦 Request satisfacerNecesidad: necesidadID={}, cantidad={}", necesidadID, cantidad);
 
+        if (cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad a satisfacer debe ser mayor a 0");
+        }
+
         NecesidadMaterial necesidad =
                 this.necesidadesRepository
                         .findById(IdUtils.parse(necesidadID))
@@ -283,6 +293,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
             log.error("🏭 No se pudo agregar la entidad benéfica: la entidad benéfica no puede ser nula");
             throw new IllegalArgumentException("La entidad benéfica no puede ser nula");
         }
+
+        requireText(entidadBeneficaDTO.razonSocial(), "razonSocial");
 
         EntidadBenefica entidadBeneficaGuardada =
                 this.entidadesRepository.save(this.entidadAssembler.toDomain(entidadBeneficaDTO));
@@ -351,6 +363,17 @@ public class Fachada implements FachadaDonadoresYEntidades {
         if (necesidadMaterialDTO == null) {
             log.error("📦 No se pudo registrar la necesidad: la necesidad no puede ser nula");
             throw new IllegalArgumentException("La necesidad no puede ser nula");
+        }
+
+        requireText(necesidadMaterialDTO.entidadID(), "entidadID");
+        requireText(necesidadMaterialDTO.productoSolicitadoID(), "productoSolicitadoID");
+        if (necesidadMaterialDTO.nivelDeUrgencia() == null
+                || necesidadMaterialDTO.nivelDeUrgencia() < 1
+                || necesidadMaterialDTO.nivelDeUrgencia() > 10) {
+            throw new IllegalArgumentException("El campo 'nivelDeUrgencia' es requerido y debe estar entre 1 y 10");
+        }
+        if (necesidadMaterialDTO.cantidadObjetivo() == null || necesidadMaterialDTO.cantidadObjetivo() <= 0) {
+            throw new IllegalArgumentException("El campo 'cantidadObjetivo' es requerido y debe ser mayor a 0");
         }
 
         String productoID = necesidadMaterialDTO.productoSolicitadoID();
@@ -536,5 +559,11 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🏭 Entidad benéfica {} obtenida: {}", entidadID, entidad);
         return entidad;
+    }
+
+    private static void requireText(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo '" + campo + "' es requerido");
+        }
     }
 }

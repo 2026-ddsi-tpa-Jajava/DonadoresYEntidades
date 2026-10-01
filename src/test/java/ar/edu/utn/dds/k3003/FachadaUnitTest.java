@@ -1,5 +1,7 @@
 package ar.edu.utn.dds.k3003;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.DonadorDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EntidadBeneficaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
 import ar.edu.utn.dds.k3003.clients.DonacionesApiClient;
@@ -99,5 +101,32 @@ public class FachadaUnitTest {
   void testFachada_obtenerNecesidadesInsatisfechasDeThrowsExceptionWhenProductIdIsBlankOrNull() {
     Assertions.assertThrows(IllegalArgumentException.class, () -> fachada.obtenerNecesidadesInsatisfechasDe(null));
     Assertions.assertThrows(IllegalArgumentException.class, () -> fachada.obtenerNecesidadesInsatisfechasDe(""));
+  }
+
+  @Test
+  void testFachada_agregarDonadorRechazaCamposInvalidos() {
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> fachada.agregarDonador(new DonadorDTO(null, " ", "Perez", 30, "a@b.com", "1", "x", null, null)));
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> fachada.agregarDonador(new DonadorDTO(null, "Ana", "Perez", 0, "a@b.com", "1", "x", null, null)));
+  }
+
+  @Test
+  void testFachada_agregarEntidadRechazaRazonSocialVacia() {
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> fachada.agregarEntidad(new EntidadBeneficaDTO(null, "", "x", "1", "a@b.com")));
+  }
+
+  @Test
+  void testFachada_registrarNecesidadRechazaUrgenciaYCantidadInvalidas() {
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> fachada.registrarNecesidad(new NecesidadMaterialDTO(null, "1", 11, "d", 5, "p", TipoNecesidadMaterialEnum.EXTRAORDINARIA)));
+    Assertions.assertThrows(IllegalArgumentException.class,
+        () -> fachada.registrarNecesidad(new NecesidadMaterialDTO(null, "1", 5, "d", 0, "p", TipoNecesidadMaterialEnum.EXTRAORDINARIA)));
+  }
+
+  @Test
+  void testFachada_satisfacerNecesidadRechazaCantidadNoPositiva() {
+    Assertions.assertThrows(IllegalArgumentException.class, () -> fachada.satisfacerNecesidad("1", 0));
   }
 }
