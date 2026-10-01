@@ -101,7 +101,7 @@ public class DonadorController {
         return ResponseEntity.status(HttpStatus.OK).body(this.fachada.obtenerQuejasDe(id));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/donadores/quejas")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/quejas")
     public ResponseEntity<Void> deleteAllComplaints() {
         this.fachada.eliminarTodasLasQuejas();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

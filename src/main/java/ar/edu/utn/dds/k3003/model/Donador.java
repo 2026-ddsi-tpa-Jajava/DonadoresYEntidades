@@ -143,6 +143,6 @@ public class Donador extends PersistableEntity {
 
   private void agregarEstadoAHistorial(EstadoDonadorEnum estado) {
     if (!this.historialEstados.isEmpty() && this.historialEstados.getLast().equals(estado)) return;
-    this.historialEstados.add(this.estado);
+    this.historialEstados.add(estado);
   }
 }
