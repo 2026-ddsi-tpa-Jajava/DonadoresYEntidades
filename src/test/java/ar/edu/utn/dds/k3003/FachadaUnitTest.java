@@ -8,6 +8,7 @@ import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.MisionDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.TipoMisionEnum;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.EntidadBeneficaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.NecesidadMaterialDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.QuejaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.TipoNecesidadMaterialEnum;
 import ar.edu.utn.dds.k3003.clients.DonacionesApiClient;
 import ar.edu.utn.dds.k3003.clients.IncentivosApiClient;
@@ -129,6 +130,16 @@ public class FachadaUnitTest {
     Assertions.assertEquals(donador.nombre(), stats.nombre());
     Assertions.assertTrue(stats.insigniasID().isEmpty());
     Assertions.assertNull(stats.misionActualID());
+  }
+
+  @Test
+  void testFachada_primeraQuejaNoCambiaElEstadoDelDonador() {
+    DonadorDTO donador = fachada.agregarDonador(
+        new DonadorDTO(null, "Ana", "Perez", 30, "a@b.com", "1", "x", EstadoDonadorEnum.VERIFICADO, "x"));
+
+    fachada.agregarQueja(new QuejaDTO(null, "don1", donador.id(), null, "desc"));
+
+    Assertions.assertEquals(EstadoDonadorEnum.VERIFICADO, fachada.buscarDonadorPorID(donador.id()).estado());
   }
 
   @Test

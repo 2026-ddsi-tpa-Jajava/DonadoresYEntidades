@@ -24,13 +24,21 @@ public class IncentivosApiClient {
             if (BASE_URL == null || BASE_URL.isBlank()) return null;
 
             String url = "/misiones/" + donadorID;
-            return restClientBuilder.get(url, MisionDTO.class);
+            try {
+                return restClientBuilder.get(url, MisionDTO.class);
+            } catch (Exception e) {
+                return null;
+            }
     }
 
     public List<InsigniaDTO> obtenerInsigniasDeDonador(String donadorID) {
         if (BASE_URL == null || BASE_URL.isBlank()) return List.of();
 
         String url = "/insignias/" + donadorID;
-        return restClientBuilder.get(url, new ParameterizedTypeReference<>() {});
+        try {
+            return restClientBuilder.get(url, new ParameterizedTypeReference<>() {});
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

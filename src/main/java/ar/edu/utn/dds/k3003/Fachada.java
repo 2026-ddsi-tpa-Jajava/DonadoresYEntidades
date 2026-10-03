@@ -44,10 +44,10 @@ public class Fachada implements FachadaDonadoresYEntidades {
     private final DonacionesApiClient donacionesApiClient;
     private final LogisticaApiClient logisticaApiClient;
 
-    @Value("${donadores.quejas.umbral-sospechoso:" + Donador.UMBRAL_SOSPECHOSO_POR_DEFECTO + "}")
+    @Value("${donadores.quejas.umbral-sospechoso}")
     private int umbralQuejasSospechoso = Donador.UMBRAL_SOSPECHOSO_POR_DEFECTO;
 
-    @Value("${donadores.quejas.umbral-baneado:" + Donador.UMBRAL_BANEADO_POR_DEFECTO + "}")
+    @Value("${donadores.quejas.umbral-baneado}")
     private int umbralQuejasBaneado = Donador.UMBRAL_BANEADO_POR_DEFECTO;
 
     @Autowired
@@ -273,17 +273,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     @Override
     public DonadorStatsDTO estadisticasDonador(String donadorID) {
+        Metrics.counter("estadisticas.consultadas").increment();
         log.info("🧑 Obteniendo estadísticas del donador {}...", donadorID);
 
         Donador donador = this.obtenerDonador(donadorID);
 
-        log.info("🧑 Solicitando insignias del donador {} a incentivosApiClient", donadorID);
+        log.info("🧑 Solicitando insignias del donador {} a 'Incentivos'", donadorID);
         List<Insignia> insignias = this.incentivosApiClient.obtenerInsigniasDeDonador(donadorID).stream()
                 .map(this.insigniaMapper::map)
                 .toList();
         log.info("🧑 Insignias recibidas del donador {}: {}", donadorID, insignias);
 
-        log.info("🧑 Solicitando misión actual del donador {} a incentivosApiClient", donadorID);
+        log.info("🧑 Solicitando misión actual del donador {} a 'Incentivos'", donadorID);
         MisionDTO misionDTO = this.incentivosApiClient.obtenerMisionActualDeDonador(donadorID);
         log.info("🧑 Misión recibida del donador {}: {}", donadorID, misionDTO);
 
@@ -396,7 +397,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         String productoID = necesidadMaterialDTO.productoSolicitadoID();
 
-        log.info("📦 Consultando validez del producto {} a donacionesApiClient", productoID);
+        log.info("📦 Consultando validez del producto {} a 'Donaciones'", productoID);
         boolean esProductoValido = this.donacionesApiClient
                 .esProductoValido(productoID);
         log.info("📦 Producto {} válido: {}", productoID, esProductoValido);
@@ -408,7 +409,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         NecesidadMaterial necesidad = this.necesidadAssembler.toDomain(necesidadMaterialDTO);
 
-        log.info("📦 Consultando stock disponible del producto {} a logisticaApiClient", productoID);
+        log.info("📦 Consultando stock disponible del producto {} a 'Logística'", productoID);
         int cantidadEnStock = this.logisticaApiClient.cuantoStockHayDe(productoID);
         log.info("📦 Stock disponible del producto {}: {}", productoID, cantidadEnStock);
 
@@ -474,7 +475,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
                                 });
 
         if (productoSolicitadoID != null) {
-            log.info("📦 Consultando validez del producto {} a donacionesApiClient", productoSolicitadoID);
+            log.info("📦 Consultando validez del producto {} a 'Donaciones'", productoSolicitadoID);
             boolean esProductoValido = this.donacionesApiClient.esProductoValido(productoSolicitadoID);
             log.info("📦 Producto {} válido: {}", productoSolicitadoID, esProductoValido);
 
