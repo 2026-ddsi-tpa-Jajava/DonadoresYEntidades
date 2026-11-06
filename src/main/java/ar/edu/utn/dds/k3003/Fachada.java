@@ -13,6 +13,7 @@ import ar.edu.utn.dds.k3003.exceptions.EntidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.exceptions.NecesidadNoEncontradaException;
 import ar.edu.utn.dds.k3003.mappers.*;
 import ar.edu.utn.dds.k3003.model.*;
+import ar.edu.utn.dds.k3003.queue.Publisher;
 import ar.edu.utn.dds.k3003.repositories.*;
 import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,8 @@ public class Fachada implements FachadaDonadoresYEntidades {
     @Value("${donadores.quejas.umbral-baneado}")
     private int umbralQuejasBaneado = Donador.UMBRAL_BANEADO_POR_DEFECTO;
 
+    private final Publisher publisher;
+
     @Autowired
     public Fachada(
             DonadoresRepository donadoresRepository,
@@ -58,7 +61,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
             NecesidadesRepository necesidadesRepository,
             IncentivosApiClient incentivosApiClient,
             DonacionesApiClient donacionesApiClient,
-            LogisticaApiClient logisticaApiClient) {
+            LogisticaApiClient logisticaApiClient, Publisher publisher) {
         this.donadoresRepository = donadoresRepository;
         this.entidadesRepository = entidadesRepository;
         this.quejasRepository = quejasRepository;
@@ -66,6 +69,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
         this.incentivosApiClient = incentivosApiClient;
         this.donacionesApiClient = donacionesApiClient;
         this.logisticaApiClient = logisticaApiClient;
+        this.publisher = publisher;
     }
 
     @PostConstruct
@@ -79,6 +83,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
     // Constructor por defecto para uso en tests o ejecución sin Spring
     public Fachada() {
+        this.publisher = null; // sin broker: no se publican eventos
         this.donacionesApiClient = new DonacionesApiClient();
         this.incentivosApiClient = new IncentivosApiClient();
         this.logisticaApiClient = new LogisticaApiClient();
@@ -540,6 +545,18 @@ public class Fachada implements FachadaDonadoresYEntidades {
         log.info("📢 Eliminando todas las quejas...");
         this.quejasRepository.deleteAll();
         log.info("📢 Todas las quejas fueron eliminadas");
+    }
+
+    // Se invoca recién después de persistir: un fallo del broker no debe invalidar la operación ya realizada.
+    private void publicar(String tipo, Object payload) {
+        if (this.publisher == null) {
+            return;
+        }
+        try {
+            this.publisher.publishEvent(tipo, payload);
+        } catch (Exception e) {
+            log.error("📨 No se pudo publicar el evento {} con payload {}", tipo, payload, e);
+        }
     }
 
     private Donador obtenerDonador(String donadorID) {

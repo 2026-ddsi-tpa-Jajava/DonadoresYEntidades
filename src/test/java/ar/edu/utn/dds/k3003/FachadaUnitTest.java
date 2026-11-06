@@ -40,6 +40,7 @@ public class FachadaUnitTest {
   @Mock private DonacionesApiClient donacionesApiClient;
   @Mock private IncentivosApiClient incentivosApiClient;
   @Mock private LogisticaApiClient logisticaApiClient;
+  @Mock private ar.edu.utn.dds.k3003.queue.Publisher publisher;
 
   private Fachada fachada;
 
@@ -53,7 +54,8 @@ public class FachadaUnitTest {
         new InMemoryNecesidadesRepo(),
         incentivosApiClient,
         donacionesApiClient,
-        logisticaApiClient);
+        logisticaApiClient,
+        publisher);
   }
 
   @Test
