@@ -115,6 +115,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🧑 Donador {} agregado correctamente", resultado.id());
         log.info("🧑 Response agregarDonador: {}", resultado);
+        this.publicar(Publisher.DONADOR_ACTUALIZADO, resultado);
         return resultado;
     }
 
@@ -164,6 +165,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🧑 Estado del donador {} modificado a {}", donadorID, estado);
         log.info("🧑 Response modificarEstado: {}", resultado);
+        this.publicar(Publisher.DONADOR_ACTUALIZADO, resultado);
         return resultado;
     }
 
@@ -184,6 +186,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🧑 Categoría del donador {} modificada a {}", donadorID, categoria);
         log.info("🧑 Response modificarCategoria: {}", resultado);
+        this.publicar(Publisher.DONADOR_ACTUALIZADO, resultado);
         return resultado;
     }
 
@@ -273,6 +276,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("📦 Necesidad {} satisfecha con cantidad {}", necesidadID, cantidad);
         log.info("📦 Response satisfacerNecesidad: {}", resultado);
+        this.publicar(Publisher.NECESIDAD_ACTUALIZADA, resultado);
         return resultado;
     }
 
@@ -327,6 +331,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🏭 Entidad benéfica {} agregada correctamente", resultado.id());
         log.info("🏭 Response agregarEntidad: {}", resultado);
+        this.publicar(Publisher.ENTIDAD_ACTUALIZADA, resultado);
         return resultado;
     }
 
@@ -376,6 +381,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("🏭 Entidad benéfica {} modificada correctamente", entidadID);
         log.info("🏭 Response modificarEntidad: {}", resultado);
+        this.publicar(Publisher.ENTIDAD_ACTUALIZADA, resultado);
         return resultado;
     }
 
@@ -441,6 +447,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("📦 Necesidad {} registrada correctamente", resultado.id());
         log.info("📦 Response registrarNecesidad: {}", resultado);
+        this.publicar(Publisher.NECESIDAD_ACTUALIZADA, resultado);
         return resultado;
     }
 
@@ -498,6 +505,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("📦 Necesidad {} modificada correctamente", necesidadID);
         log.info("📦 Response modificarNecesidad: {}", resultado);
+        this.publicar(Publisher.NECESIDAD_ACTUALIZADA, resultado);
         return resultado;
     }
 
@@ -510,6 +518,7 @@ public class Fachada implements FachadaDonadoresYEntidades {
 
         log.info("📦 Necesidad {} eliminada correctamente", id);
         log.info("📦 Response eliminarNecesidad: {}", resultado);
+        this.publicar(Publisher.NECESIDAD_ELIMINADA, resultado);
         return resultado;
     }
 
@@ -532,12 +541,15 @@ public class Fachada implements FachadaDonadoresYEntidades {
         Queja queja = this.quejasRepository.save(this.quejaAssembler.toDomain(quejaDTO));
         Donador donador = this.obtenerDonador(IdUtils.stringify(queja.getDonadorID()));
         donador.agregarQueja(this.umbralQuejasSospechoso, this.umbralQuejasBaneado);
-        this.donadoresRepository.update(donador);
+        Donador donadorActualizado = this.donadoresRepository.update(donador);
         Metrics.counter("quejas.registradas").increment();
         QuejaDTO resultado = this.quejaAssembler.toDTO(queja);
 
         log.info("📢 Queja {} agregada correctamente para el donador {}", resultado.id(), queja.getDonadorID());
         log.info("📢 Response agregarQueja: {}", resultado);
+        this.publicar(Publisher.QUEJA_REGISTRADA, resultado);
+        // La queja puede haber cambiado el estado del donador (sospechoso/baneado)
+        this.publicar(Publisher.DONADOR_ACTUALIZADO, this.donadorAssembler.toDTO(donadorActualizado));
         return resultado;
     }
 
